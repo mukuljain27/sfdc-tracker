@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SFDC Jira Daily Tracker — Birdeye</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1d2433; padding: 20px; }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .title { font-size: 20px; font-weight: 700; }
+    .title .badge { background: #0052cc; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: 8px; font-weight: 500; }
+    .subtitle { font-size: 12px; color: #6b778c; margin-bottom: 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .jira-link { color: #0052cc; text-decoration: none; font-size: 12px; }
+    .jira-link:hover { text-decoration: underline; }
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .card { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .card-label { font-size: 11px; color: #6b778c; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 5px; }
+    .card-val { font-size: 28px; font-weight: 700; }
+    .card-sub { font-size: 11px; color: #6b778c; margin-top: 3px; }
+    .c-open .card-val { color: #0052cc; }
+    .c-morning .card-val { color: #ff8b00; }
+    .c-evening .card-val { color: #5243aa; }
+    .c-resolved .card-val { color: #00875a; }
+    .section { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 14px; }
+    .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .sec-title { font-size: 14px; font-weight: 600; }
+    .sec-sub { font-size: 11px; color: #6b778c; }
+    .tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 2px solid #dfe1e6; }
+    .tab { padding: 8px 18px; font-size: 13px; font-weight: 500; color: #6b778c; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tab.active { color: #0052cc; border-bottom-color: #0052cc; }
+    .tab:hover:not(.active) { color: #1d2433; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 11px; font-weight: 600; color: #6b778c; text-transform: uppercase; letter-spacing: .4px; padding: 7px 10px; border-bottom: 2px solid #f0f2f5; white-space: nowrap; }
+    td { padding: 8px 10px; font-size: 13px; border-bottom: 1px solid #f4f5f7; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafbfc; }
+    .pill { display: inline-block; border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+    .p-open   { background: #deebff; color: #0052cc; }
+    .p-gray   { background: #ebecf0; color: #5e6c84; }
+    .p-green  { background: #e3fcef; color: #006644; }
+    .p-red    { background: #ffebe6; color: #bf2600; }
+    .p-yellow { background: #fffae6; color: #7a5c00; }
+    .d-up { color: #00875a; font-weight: 600; }
+    .d-dn { color: #bf2600; font-weight: 600; }
+    .d-no { color: #97a0af; }
+    .bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .bar-bg { flex: 1; height: 6px; background: #ebecf0; border-radius: 3px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 3px; background: #0052cc; }
+    .mod-name { font-weight: 600; color: #172b4d; }
+    .row-link { color: #0052cc; text-decoration: none; font-size: 11px; }
+    .row-link:hover { text-decoration: underline; }
+    .total-row td { font-weight: 700; background: #f8f9fb; }
+    .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .chart-wrap { height: 200px; position: relative; }
+    .updated-badge { display: inline-flex; align-items: center; gap: 5px; background: #e3fcef; color: #006644; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
+    .history-date { font-weight: 600; font-size: 12px; color: #5e6c84; vertical-align: top; padding-top: 10px; }
+    @media (max-width: 700px) {
+      .cards { grid-template-columns: repeat(2,1fr); }
+      .chart-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────── -->
+<div class="header">
+  <div class="title">SFDC Jira Daily Tracker <span class="badge">BIRDEYE Project</span></div>
+  <span class="updated-badge" id="updatedBadge">⏱ Loading…</span>
+</div>
+<div class="subtitle">
+  <span id="dateLabel">—</span>
+  <a class="jira-link" href="https://birdeye.atlassian.net/jira/dashboards/11120" target="_blank">↗ View Dashboard 11120 in Jira</a>
+  <span style="margin-left:auto;font-size:11px;color:#97a0af" id="autoNote">Auto-updates at 9 AM &amp; 6:30 PM IST via GitHub Actions</span>
+</div>
+
+<!-- ── Summary cards ──────────────────────────── -->
+<div class="cards">
+  <div class="card c-morning">
+    <div class="card-label">Morning Count (9 AM)</div>
+    <div class="card-val" id="cMorn">—</div>
+    <div class="card-sub" id="cMornT">—</div>
+  </div>
+  <div class="card c-evening">
+    <div class="card-label">Evening Count (6:30 PM)</div>
+    <div class="card-val" id="cEve">—</div>
+    <div class="card-sub" id="cEveT">—</div>
+  </div>
+  <div class="card c-resolved">
+    <div class="card-label">Resolved Today</div>
+    <div class="card-val" id="cRes">—</div>
+    <div class="card-sub">Morning → Evening delta</div>
+  </div>
+  <div class="card c-open">
+    <div class="card-label">Last Fetched</div>
+    <div class="card-val" id="cLast">—</div>
+    <div class="card-sub" id="cLastT">—</div>
+  </div>
+</div>
+
+<!-- ── Tabs ───────────────────────────────────── -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('modules')">By Module</div>
+  <div class="tab" onclick="switchTab('history')">History</div>
+  <div class="tab" onclick="switchTab('charts')">Charts</div>
+</div>
+
+<!-- ── Tab: Modules ───────────────────────────── -->
+<div class="tab-panel active" id="tab-modules">
+  <div class="section">
+    <div class="sec-header">
+      <div class="sec-title">Module-wise SFDC Count</div>
+      <div class="sec-sub">Click module name to open in Jira</div>
+    </div>
+    <div id="modTable"></div>
+  </div>
+</div>
+
+<!-- ── Tab: History ───────────────────────────── -->
+<div class="tab-panel" id="tab-history">
+  <div class="section">
+    <div class="sec-title" style="margin-bottom:12px">Daily History (Last 7 Days)</div>
+    <div id="histTable"></div>
+  </div>
+</div>
+
+<!-- ── Tab: Charts ────────────────────────────── -->
+<div class="tab-panel" id="tab-charts">
+  <div class="chart-row">
+    <div class="section">
+      <div class="sec-title" style="margin-bottom:12px">Morning vs Evening by Module</div>
+      <div class="chart-wrap"><canvas id="chartModule"></canvas></div>
+    </div>
+    <div class="section">
+      <div class="sec-title" style="margin-bottom:12px">Resolved Today by Module</div>
+      <div class="chart-wrap"><canvas id="chartResolved"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA — injected by GitHub Action ─────────────────────────
+// ACTION_DATA_START
+const TRACKER_DATA = {
+  "date": "2026-05-21",
+  "lastUpdated": "2026-05-21T18:05:00+05:30",
+  "morning": {
+    "time": "10:13 AM",
+    "total": 228,
+    "modules": {
+      "Campaign": 33, "Listings": 25, "Account": 22, "Social": 16, "Aggregation": 10,
+      "Messenger": 9, "Reviews": 9, "Surveys": 8, "Integrations": 7, "Salesforce": 7,
+      "Insights": 6, "Profile": 6, "Settings": 6, "Other": 5, "Payments": 5,
+      "Channel": 4, "Mobile App": 4, "Reports": 4, "API": 4, "Search AI": 4,
+      "Billing Flow": 3, "Review Response": 3, "Website": 3, "Inbox": 3, "Web Chat": 3,
+      "NLP": 3, "Marketing Automation": 2, "Kontacto": 2, "Competitors": 2, "SSO": 2,
+      "Integration": 1, "Update Billing Info": 1, "Appointments": 1, "Ticketing": 1,
+      "Survey": 1, "Webchat": 1, "Past Due": 1, "DoUp": 1
+    }
+  },
+  "evening": {
+    "time": "6:05 PM",
+    "total": 142,
+    "modules": {
+      "Campaign": 22, "Social": 10, "Account": 9, "Integrations": 7, "Reviews": 8,
+      "Settings": 8, "Listings": 5, "Insights": 6, "Reports": 5, "Messenger": 5,
+      "Aggregation": 5, "Search AI": 3, "Billing Flow": 3, "Salesforce": 6, "DoUp": 3,
+      "Review Response": 2, "Profile": 4, "Surveys": 4, "Mobile App": 4, "Web Chat": 1,
+      "API": 1, "SSO": 2, "NLP": 2, "Website": 3, "Update Billing Info": 1, "Ticketing": 1,
+      "Marketing Automation": 1, "Other": 3, "Channel": 2, "Payments": 3, "Armor": 1,
+      "Kontacto": 1, "Competitors": 1
+    }
+  },
+  "history": [
+    {
+      "date": "2026-05-21",
+      "morning": { "time": "10:13 AM", "total": 228 },
+      "evening": { "time": "6:05 PM",  "total": 142 }
+    }
+  ]
+};
+// ACTION_DATA_END
+
+// ── Constants ─────────────────────────────────────────────────
+const JIRA   = 'https://birdeye.atlassian.net';
+const BASE_JQL = `project = BIRDEYE AND status not in (Closed, "Live on Production", "Verified on Production", "With Support", Done, BLOCKED, LAUNCHED, "LAUNCH VERIFIED", Resolved) AND salesforceAssociatedIds is not EMPTY AND "SFDC Case Type[Dropdown]" not in ("Feature Request") AND "SFDC Case Category[Dropdown]" not in ("Business Systems") AND ("SFDC Module[Dropdown]" not in ("Business Systems") OR "SFDC Module New[Short text]" !~ "Business Systems")`;
+const PAL = ['#0052cc','#0065ff','#2684ff','#4c9aff','#b3d4ff','#00875a','#36b37e','#abf5d1','#ff8b00','#ffc400','#5243aa','#8777d9','#bf2600','#ff7452','#de350b'];
+let charts = {};
+
+function jiraUrl(jql) {
+  return `${JIRA}/issues/?jql=${encodeURIComponent(jql)}`;
+}
+function moduleJql(mod) {
+  return BASE_JQL + ` AND "SFDC Module[Dropdown]" = "${mod.replace(/"/g,'\\"')}" ORDER BY createdDate DESC`;
+}
+
+// ── Tab switching ──────────────────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['modules','history','charts'][i] === id);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (id === 'charts') renderCharts();
+}
+
+// ── Cards ─────────────────────────────────────────────────────
+function renderCards() {
+  const { morning, evening } = TRACKER_DATA;
+  if (morning) {
+    document.getElementById('cMorn').textContent  = morning.total;
+    document.getElementById('cMornT').textContent = 'Captured at ' + morning.time;
+  }
+  if (evening) {
+    document.getElementById('cEve').textContent  = evening.total;
+    document.getElementById('cEveT').textContent = 'Captured at ' + evening.time;
+  }
+  if (morning && evening) {
+    const resolved = morning.total - evening.total;
+    document.getElementById('cRes').textContent = resolved > 0 ? '+' + resolved : resolved;
+  }
+  // Last fetched = whichever is later
+  const last = evening || morning;
+  if (last) {
+    document.getElementById('cLast').textContent  = last.total;
+    document.getElementById('cLastT').textContent = 'As of ' + last.time;
+  }
+}
+
+// ── Module table ──────────────────────────────────────────────
+function renderModTable() {
+  const { morning, evening } = TRACKER_DATA;
+  const morn = morning?.modules || {};
+  const eve  = evening?.modules || {};
+
+  // Union of all modules, sorted by morning count
+  const mods = [...new Set([...Object.keys(morn), ...Object.keys(eve)])]
+    .sort((a, b) => (morn[b] || 0) - (morn[a] || 0));
+
+  const totalMorn = morning?.total || 0;
+  const totalEve  = evening?.total || 0;
+  const allLink   = jiraUrl(BASE_JQL + ' ORDER BY createdDate DESC');
+
+  let h = `<table><thead><tr>
+    <th>Module</th>
+    <th>Morning (${morning?.time || '9 AM'})</th>
+    <th>Evening (${evening?.time || '6:30 PM'})</th>
+    <th>Resolved Today</th>
+    <th>% of Morning</th>
+  </tr></thead><tbody>`;
+
+  for (const mod of mods) {
+    const m   = morn[mod] ?? 0;
+    const e   = eve[mod]  ?? null;
+    const res = e !== null ? m - e : null;
+    const pct = totalMorn > 0 ? ((m / totalMorn) * 100).toFixed(0) : 0;
+    const link = jiraUrl(moduleJql(mod));
+
+    let dCell = '<td class="d-no">—</td>';
+    if (res !== null) {
+      if (res > 0)      dCell = `<td class="d-up">✓ ${res} resolved</td>`;
+      else if (res < 0) dCell = `<td class="d-dn">${Math.abs(res)} added</td>`;
+      else              dCell = `<td class="d-no">No change</td>`;
+    }
+
+    h += `<tr>
+      <td class="mod-name"><a class="row-link" href="${link}" target="_blank">${mod} ↗</a></td>
+      <td><span class="pill p-gray">${m}</span></td>
+      <td>${e !== null ? `<span class="pill p-open">${e}</span>` : '<span style="color:#ccc">—</span>'}</td>
+      ${dCell}
+      <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><span style="font-size:11px;color:#6b778c">${pct}%</span></div></td>
+    </tr>`;
+  }
+
+  // Total row
+  const totalRes = (morning && evening) ? morning.total - evening.total : null;
+  h += `<tr class="total-row">
+    <td>TOTAL</td>
+    <td><span class="pill p-gray">${totalMorn}</span></td>
+    <td>${totalEve ? `<span class="pill p-open">${totalEve}</span>` : '—'}</td>
+    <td>${totalRes !== null ? `<span class="pill p-green">✓ ${totalRes} resolved</span>` : '—'}</td>
+    <td></td>
+  </tr></tbody></table>
+  <div style="font-size:13px;color:#5e6c84;margin-top:10px">
+    Showing <strong style="color:#172b4d">${mods.length}</strong> of
+    <a href="${allLink}" target="_blank" style="color:#0052cc;font-weight:600;text-decoration:none">${mods.length} ↗</a>
+    statistics
+  </div>`;
+
+  document.getElementById('modTable').innerHTML = h;
+}
+
+// ── History table ─────────────────────────────────────────────
+function renderHistory() {
+  const hist = (TRACKER_DATA.history || []).slice().reverse();
+  if (!hist.length) {
+    document.getElementById('histTable').innerHTML = '<div style="color:#97a0af;padding:12px">No history yet</div>';
+    return;
+  }
+  let h = `<table><thead><tr><th>Date</th><th>Morning</th><th>Evening</th><th>Resolved</th></tr></thead><tbody>`;
+  for (const day of hist) {
+    const m = day.morning?.total ?? null;
+    const e = day.evening?.total ?? null;
+    const r = (m !== null && e !== null) ? m - e : null;
+    h += `<tr>
+      <td class="history-date">${day.date}</td>
+      <td>${m !== null ? `<span class="pill p-gray">${m}</span><span style="font-size:11px;color:#97a0af;margin-left:4px">@ ${day.morning.time}</span>` : '—'}</td>
+      <td>${e !== null ? `<span class="pill p-open">${e}</span><span style="font-size:11px;color:#97a0af;margin-left:4px">@ ${day.evening.time}</span>` : '—'}</td>
+      <td>${r !== null ? (r > 0 ? `<span class="pill p-green">✓ ${r}</span>` : `<span class="pill p-red">${r}</span>`) : '—'}</td>
+    </tr>`;
+  }
+  h += '</tbody></table>';
+  document.getElementById('histTable').innerHTML = h;
+}
+
+// ── Charts ────────────────────────────────────────────────────
+function renderCharts() {
+  const { morning, evening } = TRACKER_DATA;
+  if (!morning) return;
+
+  const morn = morning.modules;
+  const eve  = evening?.modules || {};
+  const mods = Object.keys(morn).sort((a,b) => morn[b] - morn[a]).slice(0, 15);
+
+  // Morning vs Evening bar chart
+  const ctx1 = document.getElementById('chartModule').getContext('2d');
+  if (charts.module) charts.module.destroy();
+  charts.module = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: mods,
+      datasets: [
+        { label: 'Morning', data: mods.map(m => morn[m] || 0), backgroundColor: '#ff8b00', borderRadius: 3 },
+        { label: 'Evening', data: mods.map(m => eve[m]  || 0), backgroundColor: '#5243aa', borderRadius: 3 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { size: 10 } } } },
+      scales: { x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 35 } },
+                y: { beginAtZero: true, ticks: { stepSize: 5, font: { size: 10 } } } } }
+  });
+
+  // Resolved by module
+  const resolvedMods = mods.filter(m => (morn[m] || 0) - (eve[m] || 0) > 0)
+    .sort((a,b) => ((morn[b]||0)-(eve[b]||0)) - ((morn[a]||0)-(eve[a]||0)));
+  const ctx2 = document.getElementById('chartResolved').getContext('2d');
+  if (charts.resolved) charts.resolved.destroy();
+  charts.resolved = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: resolvedMods,
+      datasets: [{ label: 'Resolved', data: resolvedMods.map(m => (morn[m]||0)-(eve[m]||0)),
+        backgroundColor: '#00875a', borderRadius: 3 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 35 } },
+                y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } } } }
+  });
+}
+
+// ── Updated badge ─────────────────────────────────────────────
+function renderHeader() {
+  const d = new Date();
+  document.getElementById('dateLabel').textContent = d.toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  const lastUpdated = new Date(TRACKER_DATA.lastUpdated);
+  const ago = Math.round((Date.now() - lastUpdated) / 60000);
+  const agoStr = ago < 60 ? `${ago}m ago` : `${Math.round(ago/60)}h ago`;
+  document.getElementById('updatedBadge').textContent = `✓ Updated ${agoStr}`;
+  document.getElementById('updatedBadge').style.background = '#e3fcef';
+  document.getElementById('updatedBadge').style.color = '#006644';
+}
+
+// ── Init ──────────────────────────────────────────────────────
+renderHeader();
+renderCards();
+renderModTable();
+renderHistory();
+</script>
+</body>
+</html>

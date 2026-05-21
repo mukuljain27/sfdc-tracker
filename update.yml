@@ -1,0 +1,41 @@
+name: Update SFDC Tracker
+
+on:
+  schedule:
+    # 9:00 AM IST  = 03:30 UTC
+    - cron: '30 3 * * 1-5'
+    # 6:30 PM IST  = 13:00 UTC
+    - cron: '0 13 * * 1-5'
+  workflow_dispatch:   # allow manual trigger from GitHub Actions UI
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to commit & push index.html
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch Jira data & update index.html
+        env:
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_TOKEN: ${{ secrets.JIRA_TOKEN }}
+        run: python scripts/fetch_counts.py
+
+      - name: Commit & push if changed
+        run: |
+          git config user.email "sfdc-tracker-bot@birdeye.com"
+          git config user.name  "SFDC Tracker Bot"
+          git add index.html
+          git diff --staged --quiet || git commit -m "chore: update SFDC counts $(TZ='Asia/Kolkata' date '+%Y-%m-%d %H:%M IST')"
+          git push
