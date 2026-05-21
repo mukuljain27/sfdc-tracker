@@ -35,27 +35,39 @@ def auth_header():
     return {"Authorization": f"Basic {creds}", "Accept": "application/json"}
 
 def fetch_all_issues():
-    issues, start = [], 0
+    """Fetch all issues using the new cursor-based /rest/api/3/search/jql endpoint."""
+    issues, token, page = [], None, 0
+    headers = {**auth_header(), "Content-Type": "application/json"}
+
     while True:
-        resp = requests.get(
-            f"{JIRA_BASE}/rest/api/3/search",
-            headers=auth_header(),
-            params={
-                "jql": BASE_JQL + " ORDER BY createdDate DESC",
-                "fields": "customfield_11027,status,assignee",
-                "maxResults": 100,
-                "startAt": start
-            },
+        body = {
+            "jql": BASE_JQL + " ORDER BY createdDate DESC",
+            "fields": ["customfield_11027", "status", "assignee"],
+            "maxResults": 100
+        }
+        if token:
+            body["nextPageToken"] = token
+
+        resp = requests.post(
+            f"{JIRA_BASE}/rest/api/3/search/jql",
+            headers=headers,
+            json=body,
             timeout=30
         )
         resp.raise_for_status()
-        data = resp.json()
-        batch = data.get("issues", [])
+        data   = resp.json()
+        batch  = data.get("issues", [])
         issues.extend(batch)
-        start += len(batch)
-        print(f"  Fetched {start} / {data.get('total', '?')} issues…")
-        if start >= data.get("total", 0) or not batch:
+        page  += 1
+        print(f"  Page {page}: {len(batch)} issues fetched (running total: {len(issues)})")
+
+        token = data.get("nextPageToken")
+        if data.get("isLast", True) or not token or not batch:
             break
+        if page >= 10:   # safety cap
+            print("  Reached page cap (10), stopping.")
+            break
+
     return issues
 
 def compute_modules(issues):
