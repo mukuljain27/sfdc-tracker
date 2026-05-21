@@ -59,6 +59,14 @@
     .chart-wrap { height: 200px; position: relative; }
     .updated-badge { display: inline-flex; align-items: center; gap: 5px; background: #e3fcef; color: #006644; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
     .history-date { font-weight: 600; font-size: 12px; color: #5e6c84; vertical-align: top; padding-top: 10px; }
+    .btn-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+    .btn { border: none; cursor: pointer; font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-primary { background: #0052cc; color: #fff; }
+    .btn-primary:hover { background: #0065ff; }
+    .btn-secondary { background: #ebecf0; color: #344563; }
+    .btn-secondary:hover { background: #dfe1e6; }
+    .btn-action { background: #e3fcef; color: #006644; border: 1px solid #abf5d1; }
+    .btn-action:hover { background: #abf5d1; }
     @media (max-width: 700px) {
       .cards { grid-template-columns: repeat(2,1fr); }
       .chart-row { grid-template-columns: 1fr; }
@@ -75,7 +83,15 @@
 <div class="subtitle">
   <span id="dateLabel">—</span>
   <a class="jira-link" href="https://birdeye.atlassian.net/jira/dashboards/11120" target="_blank">↗ View Dashboard 11120 in Jira</a>
-  <span style="margin-left:auto;font-size:11px;color:#97a0af" id="autoNote">Auto-updates at 9 AM &amp; 6:30 PM IST via GitHub Actions</span>
+  <span style="margin-left:auto;font-size:11px;color:#97a0af">Auto-updates at 9 AM &amp; 6:30 PM IST</span>
+</div>
+
+<!-- ── Action bar ──────────────────────────────── -->
+<div class="btn-bar">
+  <button class="btn btn-primary" onclick="reloadPage()" id="reloadBtn">↻ Refresh Page</button>
+  <a class="btn btn-action" href="https://github.com/mukuljain27/sfdc-tracker/actions/workflows/update.yml" target="_blank">⚡ Trigger Update in GitHub</a>
+  <a class="btn btn-secondary" href="https://birdeye.atlassian.net/issues/?jql=project%20%3D%20BIRDEYE%20AND%20status%20not%20in%20(Closed%2C%20%22Live%20on%20Production%22%2C%20%22Verified%20on%20Production%22%2C%20%22With%20Support%22%2C%20Done%2C%20BLOCKED%2C%20LAUNCHED%2C%20%22LAUNCH%20VERIFIED%22%2C%20Resolved)%20AND%20salesforceAssociatedIds%20is%20not%20EMPTY%20AND%20%22SFDC%20Case%20Type%5BDropdown%5D%22%20not%20in%20(%22Feature%20Request%22)%20AND%20%22SFDC%20Case%20Category%5BDropdown%5D%22%20not%20in%20(%22Business%20Systems%22)%20AND%20(%22SFDC%20Module%5BDropdown%5D%22%20not%20in%20(%22Business%20Systems%22)%20OR%20%22SFDC%20Module%20New%5BShort%20text%5D%22%20!~%20%22Business%20Systems%22)" target="_blank">↗ Open All in Jira</a>
+  <span style="font-size:11px;color:#97a0af;margin-left:4px" id="lastFetchNote"></span>
 </div>
 
 <!-- ── Summary cards ──────────────────────────── -->
@@ -147,142 +163,41 @@
 // ACTION_DATA_START
 const TRACKER_DATA = {
   "date": "2026-05-21",
-  "lastUpdated": "2026-05-21T18:47:01.569137+05:30",
+  "lastUpdated": "2026-05-21T18:05:00+05:30",
   "morning": {
     "time": "10:13 AM",
     "total": 228,
     "modules": {
-      "Campaign": 33,
-      "Listings": 25,
-      "Account": 22,
-      "Social": 16,
-      "Aggregation": 10,
-      "Messenger": 9,
-      "Reviews": 9,
-      "Surveys": 8,
-      "Integrations": 7,
-      "Salesforce": 7,
-      "Insights": 6,
-      "Profile": 6,
-      "Settings": 6,
-      "Other": 5,
-      "Payments": 5,
-      "Channel": 4,
-      "Mobile App": 4,
-      "Reports": 4,
-      "API": 4,
-      "Search AI": 4,
-      "Billing Flow": 3,
-      "Review Response": 3,
-      "Website": 3,
-      "Inbox": 3,
-      "Web Chat": 3,
-      "NLP": 3,
-      "Marketing Automation": 2,
-      "Kontacto": 2,
-      "Competitors": 2,
-      "SSO": 2,
-      "Integration": 1,
-      "Update Billing Info": 1,
-      "Appointments": 1,
-      "Ticketing": 1,
-      "Survey": 1,
-      "Webchat": 1,
-      "Past Due": 1,
-      "DoUp": 1
+      "Campaign": 33, "Listings": 25, "Account": 22, "Social": 16, "Aggregation": 10,
+      "Messenger": 9, "Reviews": 9, "Surveys": 8, "Integrations": 7, "Salesforce": 7,
+      "Insights": 6, "Profile": 6, "Settings": 6, "Other": 5, "Payments": 5,
+      "Channel": 4, "Mobile App": 4, "Reports": 4, "API": 4, "Search AI": 4,
+      "Billing Flow": 3, "Review Response": 3, "Website": 3, "Inbox": 3, "Web Chat": 3,
+      "NLP": 3, "Marketing Automation": 2, "Kontacto": 2, "Competitors": 2, "SSO": 2,
+      "Integration": 1, "Update Billing Info": 1, "Appointments": 1, "Ticketing": 1,
+      "Survey": 1, "Webchat": 1, "Past Due": 1, "DoUp": 1
     }
   },
   "evening": {
     "time": "6:05 PM",
     "total": 142,
     "modules": {
-      "Campaign": 22,
-      "Social": 10,
-      "Account": 9,
-      "Integrations": 7,
-      "Reviews": 8,
-      "Settings": 8,
-      "Listings": 5,
-      "Insights": 6,
-      "Reports": 5,
-      "Messenger": 5,
-      "Aggregation": 5,
-      "Search AI": 3,
-      "Billing Flow": 3,
-      "Salesforce": 6,
-      "DoUp": 3,
-      "Review Response": 2,
-      "Profile": 4,
-      "Surveys": 4,
-      "Mobile App": 4,
-      "Web Chat": 1,
-      "API": 1,
-      "SSO": 2,
-      "NLP": 2,
-      "Website": 3,
-      "Update Billing Info": 1,
-      "Ticketing": 1,
-      "Marketing Automation": 1,
-      "Other": 3,
-      "Channel": 2,
-      "Payments": 3,
-      "Armor": 1,
-      "Kontacto": 1,
-      "Competitors": 1
+      "Campaign": 22, "Social": 10, "Account": 9, "Integrations": 7, "Reviews": 8,
+      "Settings": 8, "Listings": 5, "Insights": 6, "Reports": 5, "Messenger": 5,
+      "Aggregation": 5, "Search AI": 3, "Billing Flow": 3, "Salesforce": 6, "DoUp": 3,
+      "Review Response": 2, "Profile": 4, "Surveys": 4, "Mobile App": 4, "Web Chat": 1,
+      "API": 1, "SSO": 2, "NLP": 2, "Website": 3, "Update Billing Info": 1, "Ticketing": 1,
+      "Marketing Automation": 1, "Other": 3, "Channel": 2, "Payments": 3, "Armor": 1,
+      "Kontacto": 1, "Competitors": 1
     }
   },
   "history": [
     {
       "date": "2026-05-21",
-      "morning": {
-        "time": "10:13 AM",
-        "total": 228
-      },
-      "evening": {
-        "time": "6:05 PM",
-        "total": 142
-      }
+      "morning": { "time": "10:13 AM", "total": 228 },
+      "evening": { "time": "6:05 PM",  "total": 142 }
     }
-  ],
-  "current": {
-    "time": "06:47 PM",
-    "total": 136,
-    "modules": {
-      "Reviews": 8,
-      "Aggregation": 5,
-      "Search AI": 2,
-      "Web Chat": 1,
-      "Salesforce": 6,
-      "DoUp": 3,
-      "Campaign": 23,
-      "Social": 9,
-      "API": 1,
-      "Settings": 8,
-      "Billing Flow": 3,
-      "Listings": 6,
-      "Reports": 5,
-      "Messenger": 5,
-      "Integrations": 7,
-      "Review Response": 1,
-      "Account": 8,
-      "Profile": 4,
-      "NLP": 2,
-      "Insights": 4,
-      "Website": 3,
-      "Update Billing Info": 1,
-      "Ticketing": 1,
-      "Surveys": 4,
-      "Marketing Automation": 1,
-      "Other": 2,
-      "Mobile App": 4,
-      "Channel": 2,
-      "Armor": 1,
-      "Kontacto": 1,
-      "SSO": 1,
-      "Competitors": 1,
-      "Payments": 3
-    }
-  }
+  ]
 };
 // ACTION_DATA_END
 
@@ -464,7 +379,16 @@ function renderCharts() {
   });
 }
 
-// ── Updated badge ─────────────────────────────────────────────
+// ── Reload page (picks up latest GitHub Action commit) ────────
+function reloadPage() {
+  const btn = document.getElementById('reloadBtn');
+  btn.textContent = '↻ Reloading…';
+  btn.disabled = true;
+  // Force-reload bypassing cache to get latest committed index.html
+  window.location.reload(true);
+}
+
+// ── Updated badge & header ─────────────────────────────────────
 function renderHeader() {
   const d = new Date();
   document.getElementById('dateLabel').textContent = d.toLocaleDateString('en-US', {
@@ -472,10 +396,13 @@ function renderHeader() {
   });
   const lastUpdated = new Date(TRACKER_DATA.lastUpdated);
   const ago = Math.round((Date.now() - lastUpdated) / 60000);
-  const agoStr = ago < 60 ? `${ago}m ago` : `${Math.round(ago/60)}h ago`;
-  document.getElementById('updatedBadge').textContent = `✓ Updated ${agoStr}`;
-  document.getElementById('updatedBadge').style.background = '#e3fcef';
-  document.getElementById('updatedBadge').style.color = '#006644';
+  const agoStr = ago < 60 ? `${ago}m ago` : ago < 1440 ? `${Math.round(ago/60)}h ago` : `${Math.round(ago/1440)}d ago`;
+  document.getElementById('updatedBadge').textContent = `✓ Data updated ${agoStr}`;
+  document.getElementById('updatedBadge').style.background = ago > 120 ? '#fffae6' : '#e3fcef';
+  document.getElementById('updatedBadge').style.color      = ago > 120 ? '#7a5c00' : '#006644';
+  // Show last fetch time in action bar
+  const note = document.getElementById('lastFetchNote');
+  if (note) note.textContent = `Last fetch: ${lastUpdated.toLocaleString('en-IN', {timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'})} IST`;
 }
 
 // ── Init ──────────────────────────────────────────────────────
