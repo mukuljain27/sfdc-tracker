@@ -154,11 +154,19 @@ def main():
         today_hist = {"date": today}
         history.append(today_hist)
     if existing.get("morning"):
-        today_hist["morning"] = {"time": existing["morning"]["time"], "total": existing["morning"]["total"]}
+        today_hist["morning"] = {
+            "time": existing["morning"]["time"],
+            "total": existing["morning"]["total"],
+            "modules": existing["morning"]["modules"]
+        }
     if existing.get("evening"):
-        today_hist["evening"] = {"time": existing["evening"]["time"], "total": existing["evening"]["total"]}
-    # Keep last 7 days
-    existing["history"] = sorted(history, key=lambda d: d["date"])[-7:]
+        today_hist["evening"] = {
+            "time": existing["evening"]["time"],
+            "total": existing["evening"]["total"],
+            "modules": existing["evening"]["modules"]
+        }
+    # Keep last 30 days
+    existing["history"] = sorted(history, key=lambda d: d["date"])[-30:]
 
     # Write updated HTML
     updated_html = inject_data(html, existing)
