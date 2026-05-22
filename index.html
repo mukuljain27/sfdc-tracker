@@ -9,12 +9,29 @@
     :root { color-scheme: light; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1d2433; padding: 20px; }
+
     .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
     .title { font-size: 20px; font-weight: 700; }
     .title .badge { background: #0052cc; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: 8px; font-weight: 500; }
     .subtitle { font-size: 12px; color: #6b778c; margin-bottom: 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
     .jira-link { color: #0052cc; text-decoration: none; font-size: 12px; }
     .jira-link:hover { text-decoration: underline; }
+    .btn { border: none; cursor: pointer; font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-primary { background: #0052cc; color: #fff; }
+    .btn-primary:hover { background: #0065ff; }
+    .btn-secondary { background: #ebecf0; color: #344563; }
+    .btn-secondary:hover { background: #dfe1e6; }
+    .btn-action { background: #e3fcef; color: #006644; border: 1px solid #abf5d1; }
+    .btn-action:hover { background: #abf5d1; }
+    .btn-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+
+    .tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 2px solid #dfe1e6; }
+    .tab { padding: 8px 18px; font-size: 13px; font-weight: 500; color: #6b778c; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tab.active { color: #0052cc; border-bottom-color: #0052cc; }
+    .tab:hover:not(.active) { color: #1d2433; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
     .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
     .card { background: #fff; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
     .card-label { font-size: 11px; color: #6b778c; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 5px; }
@@ -24,49 +41,49 @@
     .c-morning .card-val { color: #ff8b00; }
     .c-evening .card-val { color: #5243aa; }
     .c-resolved .card-val { color: #00875a; }
+
     .section { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 14px; }
     .sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .sec-title { font-size: 14px; font-weight: 600; }
     .sec-sub { font-size: 11px; color: #6b778c; }
-    .tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 2px solid #dfe1e6; }
-    .tab { padding: 8px 18px; font-size: 13px; font-weight: 500; color: #6b778c; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-    .tab.active { color: #0052cc; border-bottom-color: #0052cc; }
-    .tab:hover:not(.active) { color: #1d2433; }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+
     table { width: 100%; border-collapse: collapse; }
     th { text-align: left; font-size: 11px; font-weight: 600; color: #6b778c; text-transform: uppercase; letter-spacing: .4px; padding: 7px 10px; border-bottom: 2px solid #f0f2f5; white-space: nowrap; }
     td { padding: 8px 10px; font-size: 13px; border-bottom: 1px solid #f4f5f7; vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #fafbfc; }
+
     .pill { display: inline-block; border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
     .p-open   { background: #deebff; color: #0052cc; }
     .p-gray   { background: #ebecf0; color: #5e6c84; }
     .p-green  { background: #e3fcef; color: #006644; }
     .p-red    { background: #ffebe6; color: #bf2600; }
     .p-yellow { background: #fffae6; color: #7a5c00; }
+    .p-purple { background: #eae6ff; color: #403294; }
+
     .d-up { color: #00875a; font-weight: 600; }
     .d-dn { color: #bf2600; font-weight: 600; }
     .d-no { color: #97a0af; }
+
     .bar-wrap { display: flex; align-items: center; gap: 8px; }
     .bar-bg { flex: 1; height: 6px; background: #ebecf0; border-radius: 3px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 3px; background: #0052cc; }
+
+    .snap-status { font-size: 12px; color: #6b778c; }
+    .snap-status .ok { color: #00875a; }
+
+    .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .chart-wrap { height: 200px; position: relative; }
+
     .mod-name { font-weight: 600; color: #172b4d; }
     .row-link { color: #0052cc; text-decoration: none; font-size: 11px; }
     .row-link:hover { text-decoration: underline; }
     .total-row td { font-weight: 700; background: #f8f9fb; }
-    .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .chart-wrap { height: 200px; position: relative; }
-    .updated-badge { display: inline-flex; align-items: center; gap: 5px; background: #e3fcef; color: #006644; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
-    .history-date { font-weight: 600; font-size: 12px; color: #5e6c84; vertical-align: top; padding-top: 10px; }
-    .btn-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
-    .btn { border: none; cursor: pointer; font-size: 13px; font-weight: 500; padding: 7px 14px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
-    .btn-primary { background: #0052cc; color: #fff; }
-    .btn-primary:hover { background: #0065ff; }
-    .btn-secondary { background: #ebecf0; color: #344563; }
-    .btn-secondary:hover { background: #dfe1e6; }
-    .btn-action { background: #e3fcef; color: #006644; border: 1px solid #abf5d1; }
-    .btn-action:hover { background: #abf5d1; }
+    .loading { display: flex; align-items: center; justify-content: center; height: 70px; color: #97a0af; font-size: 13px; }
+
+    .hist-day-header { background: #f4f5f7; padding: 10px 14px; border-radius: 8px 8px 0 0; margin-top: 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-left: 3px solid #0052cc; }
+    .hist-day-header strong { font-size: 13px; color: #172b4d; }
+
     @media (max-width: 700px) {
       .cards { grid-template-columns: repeat(2,1fr); }
       .chart-row { grid-template-columns: 1fr; }
@@ -78,7 +95,7 @@
 <!-- ── Header ─────────────────────────────────── -->
 <div class="header">
   <div class="title">SFDC Jira Daily Tracker <span class="badge">BIRDEYE Project</span></div>
-  <span class="updated-badge" id="updatedBadge">⏱ Loading…</span>
+  <span id="lastUpdate" style="font-size:12px;color:#6b778c"></span>
 </div>
 <div class="subtitle">
   <span id="dateLabel">—</span>
@@ -88,41 +105,42 @@
 
 <!-- ── Action bar ──────────────────────────────── -->
 <div class="btn-bar">
-  <button class="btn btn-primary" onclick="reloadPage()" id="reloadBtn">↻ Refresh Page</button>
+  <button class="btn btn-primary" onclick="window.location.reload(true)">↻ Refresh Page</button>
   <a class="btn btn-action" href="https://github.com/mukuljain27/sfdc-tracker/actions/workflows/update.yml" target="_blank">⚡ Trigger Update in GitHub</a>
   <a class="btn btn-secondary" href="https://birdeye.atlassian.net/issues/?jql=project%20%3D%20BIRDEYE%20AND%20status%20not%20in%20(Closed%2C%20%22Live%20on%20Production%22%2C%20%22Verified%20on%20Production%22%2C%20%22With%20Support%22%2C%20Done%2C%20BLOCKED%2C%20LAUNCHED%2C%20%22LAUNCH%20VERIFIED%22%2C%20Resolved)%20AND%20salesforceAssociatedIds%20is%20not%20EMPTY%20AND%20%22SFDC%20Case%20Type%5BDropdown%5D%22%20not%20in%20(%22Feature%20Request%22)%20AND%20%22SFDC%20Case%20Category%5BDropdown%5D%22%20not%20in%20(%22Business%20Systems%22)%20AND%20(%22SFDC%20Module%5BDropdown%5D%22%20not%20in%20(%22Business%20Systems%22)%20OR%20%22SFDC%20Module%20New%5BShort%20text%5D%22%20!~%20%22Business%20Systems%22)" target="_blank">↗ Open All in Jira</a>
-  <span style="font-size:11px;color:#97a0af;margin-left:4px" id="lastFetchNote"></span>
 </div>
 
 <!-- ── Summary cards ──────────────────────────── -->
 <div class="cards">
+  <div class="card c-open">
+    <div class="card-label">Current Open SFDC</div>
+    <div class="card-val" id="cTotal">—</div>
+    <div class="card-sub" id="cSub">—</div>
+  </div>
   <div class="card c-morning">
     <div class="card-label">Morning Count (9 AM)</div>
     <div class="card-val" id="cMorn">—</div>
-    <div class="card-sub" id="cMornT">—</div>
+    <div class="card-sub" id="cMornT">Not captured yet</div>
   </div>
   <div class="card c-evening">
     <div class="card-label">Evening Count (6:30 PM)</div>
     <div class="card-val" id="cEve">—</div>
-    <div class="card-sub" id="cEveT">—</div>
+    <div class="card-sub" id="cEveT">Not captured yet</div>
   </div>
   <div class="card c-resolved">
     <div class="card-label">Resolved Today</div>
     <div class="card-val" id="cRes">—</div>
     <div class="card-sub">Morning → Evening delta</div>
   </div>
-  <div class="card c-open">
-    <div class="card-label">Last Fetched</div>
-    <div class="card-val" id="cLast">—</div>
-    <div class="card-sub" id="cLastT">—</div>
-  </div>
 </div>
 
 <!-- ── Tabs ───────────────────────────────────── -->
 <div class="tabs">
   <div class="tab active" onclick="switchTab('modules')">By Module</div>
-  <div class="tab" onclick="switchTab('history')">History</div>
+  <div class="tab" onclick="switchTab('assignee')">By Assignee</div>
+  <div class="tab" onclick="switchTab('status')">By Status</div>
   <div class="tab" onclick="switchTab('charts')">Charts</div>
+  <div class="tab" onclick="switchTab('history')">History</div>
 </div>
 
 <!-- ── Tab: Modules ───────────────────────────── -->
@@ -132,15 +150,32 @@
       <div class="sec-title">Module-wise SFDC Count</div>
       <div class="sec-sub">Click module name to open in Jira</div>
     </div>
-    <div id="modTable"></div>
+    <div id="modTable"><div class="loading">Loading…</div></div>
+  </div>
+  <div style="margin-top:8px;padding:8px 4px">
+    <span class="snap-status" id="snapStatus"></span>
   </div>
 </div>
 
-<!-- ── Tab: History ───────────────────────────── -->
-<div class="tab-panel" id="tab-history">
+<!-- ── Tab: Assignee ──────────────────────────── -->
+<div class="tab-panel" id="tab-assignee">
   <div class="section">
-    <div class="sec-title" style="margin-bottom:12px">Daily History (Last 7 Days)</div>
-    <div id="histTable"></div>
+    <div class="sec-header">
+      <div class="sec-title">Assignee-wise SFDC Count</div>
+      <div class="sec-sub">Open SFDC issues per team member</div>
+    </div>
+    <div id="assigneeTable"><div class="loading" style="color:#97a0af;flex-direction:column;gap:6px"><span>Assignee data requires live Jira connection</span><a href="https://github.com/mukuljain27/sfdc-tracker/actions/workflows/update.yml" target="_blank" style="font-size:11px;color:#0052cc">⚡ Trigger update to refresh →</a></div></div>
+  </div>
+</div>
+
+<!-- ── Tab: Status ────────────────────────────── -->
+<div class="tab-panel" id="tab-status">
+  <div class="section">
+    <div class="sec-header">
+      <div class="sec-title">Status-wise Breakdown</div>
+      <div class="sec-sub">Distribution of open SFDC issues by workflow status</div>
+    </div>
+    <div id="statusTable"><div class="loading" style="color:#97a0af;flex-direction:column;gap:6px"><span>Status data requires live Jira connection</span><a href="https://github.com/mukuljain27/sfdc-tracker/actions/workflows/update.yml" target="_blank" style="font-size:11px;color:#0052cc">⚡ Trigger update to refresh →</a></div></div>
   </div>
 </div>
 
@@ -156,6 +191,21 @@
       <div class="chart-wrap"><canvas id="chartResolved"></canvas></div>
     </div>
   </div>
+  <div class="section">
+    <div class="sec-title" style="margin-bottom:12px">30-Day Trend (Morning Total)</div>
+    <div class="chart-wrap" style="height:180px"><canvas id="chartTrend"></canvas></div>
+  </div>
+</div>
+
+<!-- ── Tab: History ───────────────────────────── -->
+<div class="tab-panel" id="tab-history">
+  <div class="section">
+    <div class="sec-header">
+      <div class="sec-title">Daily History (Last 30 Days)</div>
+      <div class="sec-sub">Module-wise morning → evening counts per day</div>
+    </div>
+    <div id="histTable"><div class="loading">Loading…</div></div>
+  </div>
 </div>
 
 <script>
@@ -163,246 +213,86 @@
 // ACTION_DATA_START
 const TRACKER_DATA = {
   "date": "2026-05-22",
-  "lastUpdated": "2026-05-22T09:16:09.804029+05:30",
+  "lastUpdated": "2026-05-22T09:05:00+05:30",
   "morning": {
     "time": "9:05 AM",
     "total": 194,
     "modules": {
-      "Campaign": 28,
-      "Listings": 18,
-      "Reviews": 13,
-      "Account": 13,
-      "Social": 12,
-      "Surveys": 10,
-      "Settings": 9,
-      "Integrations": 8,
-      "Reports": 8,
-      "Messenger": 7,
-      "Search AI": 6,
-      "Salesforce": 6,
-      "Aggregation": 6,
-      "Profile": 5,
-      "Mobile App": 4,
-      "Payments": 4,
-      "Insights": 4,
-      "Kontacto": 4,
-      "DoUp": 4,
-      "Other": 4,
-      "Billing Flow": 3,
-      "Website": 3,
-      "Web Chat": 2,
-      "API": 2,
-      "NLP": 2,
-      "Channel": 2,
-      "Dashboard": 1,
-      "Update Billing Info": 1,
-      "Ticketing": 1,
-      "Marketing Automation": 1,
-      "Armor": 1,
-      "SSO": 1,
-      "Competitors": 1
+      "Campaign": 28, "Listings": 18, "Reviews": 13, "Account": 13, "Social": 12,
+      "Surveys": 10, "Settings": 9, "Integrations": 8, "Reports": 8, "Messenger": 7,
+      "Search AI": 6, "Salesforce": 6, "Aggregation": 6, "Profile": 5, "Mobile App": 4,
+      "Payments": 4, "Insights": 4, "Kontacto": 4, "DoUp": 4, "Other": 4,
+      "Billing Flow": 3, "Website": 3, "Web Chat": 2, "API": 2, "NLP": 2, "Channel": 2,
+      "Dashboard": 1, "Update Billing Info": 1, "Ticketing": 1,
+      "Marketing Automation": 1, "Armor": 1, "SSO": 1, "Competitors": 1
     }
   },
   "evening": null,
   "history": [
     {
       "date": "2026-05-21",
-      "morning": {
-        "time": "10:13 AM",
-        "total": 228,
-        "modules": {
-          "Campaign": 33,
-          "Listings": 25,
-          "Account": 22,
-          "Social": 16,
-          "Aggregation": 10,
-          "Messenger": 9,
-          "Reviews": 9,
-          "Surveys": 8,
-          "Integrations": 7,
-          "Salesforce": 7,
-          "Insights": 6,
-          "Profile": 6,
-          "Settings": 6,
-          "Other": 5,
-          "Payments": 5,
-          "Channel": 4,
-          "Mobile App": 4,
-          "Reports": 4,
-          "API": 4,
-          "Search AI": 4,
-          "Billing Flow": 3,
-          "Review Response": 3,
-          "Website": 3,
-          "Inbox": 3,
-          "Web Chat": 3,
-          "NLP": 3,
-          "Marketing Automation": 2,
-          "Kontacto": 2,
-          "Competitors": 2,
-          "SSO": 2,
-          "Integration": 1,
-          "Update Billing Info": 1,
-          "Appointments": 1,
-          "Ticketing": 1,
-          "Survey": 1,
-          "Webchat": 1,
-          "Past Due": 1,
-          "DoUp": 1
-        }
-      },
-      "evening": {
-        "time": "6:05 PM",
-        "total": 142,
-        "modules": {
-          "Campaign": 22,
-          "Social": 10,
-          "Account": 9,
-          "Integrations": 7,
-          "Reviews": 8,
-          "Settings": 8,
-          "Listings": 5,
-          "Insights": 6,
-          "Reports": 5,
-          "Messenger": 5,
-          "Aggregation": 5,
-          "Search AI": 3,
-          "Billing Flow": 3,
-          "Salesforce": 6,
-          "DoUp": 3,
-          "Review Response": 2,
-          "Profile": 4,
-          "Surveys": 4,
-          "Mobile App": 4,
-          "Web Chat": 1,
-          "API": 1,
-          "SSO": 2,
-          "NLP": 2,
-          "Website": 3,
-          "Update Billing Info": 1,
-          "Ticketing": 1,
-          "Marketing Automation": 1,
-          "Other": 3,
-          "Channel": 2,
-          "Payments": 3,
-          "Armor": 1,
-          "Kontacto": 1,
-          "Competitors": 1
-        }
-      }
+      "morning": { "time": "10:13 AM", "total": 228, "modules": {
+        "Campaign": 33, "Listings": 25, "Account": 22, "Social": 16, "Aggregation": 10,
+        "Messenger": 9, "Reviews": 9, "Surveys": 8, "Integrations": 7, "Salesforce": 7,
+        "Insights": 6, "Profile": 6, "Settings": 6, "Other": 5, "Payments": 5,
+        "Channel": 4, "Mobile App": 4, "Reports": 4, "API": 4, "Search AI": 4,
+        "Billing Flow": 3, "Review Response": 3, "Website": 3, "Inbox": 3, "Web Chat": 3,
+        "NLP": 3, "Marketing Automation": 2, "Kontacto": 2, "Competitors": 2, "SSO": 2,
+        "Integration": 1, "Update Billing Info": 1, "Appointments": 1, "Ticketing": 1,
+        "Survey": 1, "Webchat": 1, "Past Due": 1, "DoUp": 1
+      }},
+      "evening": { "time": "6:05 PM", "total": 142, "modules": {
+        "Campaign": 22, "Social": 10, "Account": 9, "Integrations": 7, "Reviews": 8,
+        "Settings": 8, "Listings": 5, "Insights": 6, "Reports": 5, "Messenger": 5,
+        "Aggregation": 5, "Search AI": 3, "Billing Flow": 3, "Salesforce": 6, "DoUp": 3,
+        "Review Response": 2, "Profile": 4, "Surveys": 4, "Mobile App": 4, "Web Chat": 1,
+        "API": 1, "SSO": 2, "NLP": 2, "Website": 3, "Update Billing Info": 1, "Ticketing": 1,
+        "Marketing Automation": 1, "Other": 3, "Channel": 2, "Payments": 3, "Armor": 1,
+        "Kontacto": 1, "Competitors": 1
+      }}
     },
     {
       "date": "2026-05-22",
-      "morning": {
-        "time": "9:05 AM",
-        "total": 194,
-        "modules": {
-          "Campaign": 28,
-          "Listings": 18,
-          "Reviews": 13,
-          "Account": 13,
-          "Social": 12,
-          "Surveys": 10,
-          "Settings": 9,
-          "Integrations": 8,
-          "Reports": 8,
-          "Messenger": 7,
-          "Search AI": 6,
-          "Salesforce": 6,
-          "Aggregation": 6,
-          "Profile": 5,
-          "Mobile App": 4,
-          "Payments": 4,
-          "Insights": 4,
-          "Kontacto": 4,
-          "DoUp": 4,
-          "Other": 4,
-          "Billing Flow": 3,
-          "Website": 3,
-          "Web Chat": 2,
-          "API": 2,
-          "NLP": 2,
-          "Channel": 2,
-          "Dashboard": 1,
-          "Update Billing Info": 1,
-          "Ticketing": 1,
-          "Marketing Automation": 1,
-          "Armor": 1,
-          "SSO": 1,
-          "Competitors": 1
-        }
-      }
+      "morning": { "time": "9:05 AM", "total": 194, "modules": {
+        "Campaign": 28, "Listings": 18, "Reviews": 13, "Account": 13, "Social": 12,
+        "Surveys": 10, "Settings": 9, "Integrations": 8, "Reports": 8, "Messenger": 7,
+        "Search AI": 6, "Salesforce": 6, "Aggregation": 6, "Profile": 5, "Mobile App": 4,
+        "Payments": 4, "Insights": 4, "Kontacto": 4, "DoUp": 4, "Other": 4,
+        "Billing Flow": 3, "Website": 3, "Web Chat": 2, "API": 2, "NLP": 2, "Channel": 2,
+        "Dashboard": 1, "Update Billing Info": 1, "Ticketing": 1,
+        "Marketing Automation": 1, "Armor": 1, "SSO": 1, "Competitors": 1
+      }}
     }
-  ],
-  "current": {
-    "time": "09:16 AM",
-    "total": 194,
-    "modules": {
-      "Integrations": 8,
-      "Webchat": 1,
-      "Social": 12,
-      "Listings": 18,
-      "Other": 4,
-      "Reports": 8,
-      "Account": 13,
-      "Messenger": 7,
-      "Campaign": 28,
-      "Aggregation": 6,
-      "Kontacto": 4,
-      "Reviews": 13,
-      "API": 2,
-      "Surveys": 10,
-      "Settings": 9,
-      "Dashboard": 1,
-      "Search AI": 6,
-      "Profile": 5,
-      "Web Chat": 1,
-      "Salesforce": 6,
-      "DoUp": 4,
-      "Billing Flow": 3,
-      "NLP": 2,
-      "Insights": 4,
-      "Website": 3,
-      "Update Billing Info": 1,
-      "Ticketing": 1,
-      "Marketing Automation": 1,
-      "Mobile App": 4,
-      "Channel": 2,
-      "Payments": 4,
-      "Armor": 1,
-      "SSO": 1,
-      "Competitors": 1
-    }
-  }
+  ]
 };
 // ACTION_DATA_END
 
 // ── Constants ─────────────────────────────────────────────────
-const JIRA   = 'https://birdeye.atlassian.net';
+const JIRA    = 'https://birdeye.atlassian.net';
 const BASE_JQL = `project = BIRDEYE AND status not in (Closed, "Live on Production", "Verified on Production", "With Support", Done, BLOCKED, LAUNCHED, "LAUNCH VERIFIED", Resolved) AND salesforceAssociatedIds is not EMPTY AND "SFDC Case Type[Dropdown]" not in ("Feature Request") AND "SFDC Case Category[Dropdown]" not in ("Business Systems") AND ("SFDC Module[Dropdown]" not in ("Business Systems") OR "SFDC Module New[Short text]" !~ "Business Systems")`;
-const PAL = ['#0052cc','#0065ff','#2684ff','#4c9aff','#b3d4ff','#00875a','#36b37e','#abf5d1','#ff8b00','#ffc400','#5243aa','#8777d9','#bf2600','#ff7452','#de350b'];
-let charts = {};
+const PAL     = ['#0052cc','#0065ff','#2684ff','#4c9aff','#b3d4ff','#00875a','#36b37e','#abf5d1','#ff8b00','#ffc400','#5243aa','#8777d9','#bf2600','#ff7452','#de350b'];
+let charts    = {};
 
-function jiraUrl(jql) {
-  return `${JIRA}/issues/?jql=${encodeURIComponent(jql)}`;
-}
-function moduleJql(mod) {
-  return BASE_JQL + ` AND "SFDC Module[Dropdown]" = "${mod.replace(/"/g,'\\"')}" ORDER BY createdDate DESC`;
-}
+function jiraUrl(jql) { return `${JIRA}/issues/?jql=${encodeURIComponent(jql)}`; }
+function moduleJql(mod) { return BASE_JQL + ` AND "SFDC Module[Dropdown]" = "${mod.replace(/"/g,'\\"')}" ORDER BY createdDate DESC`; }
 
 // ── Tab switching ──────────────────────────────────────────────
 function switchTab(id) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    t.classList.toggle('active', ['modules','history','charts'][i] === id);
-  });
+  const ids = ['modules','assignee','status','charts','history'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ids[i]===id));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
   if (id === 'charts') renderCharts();
 }
 
 // ── Cards ─────────────────────────────────────────────────────
 function renderCards() {
   const { morning, evening } = TRACKER_DATA;
+  const current = evening || morning;
+  if (current) {
+    document.getElementById('cTotal').textContent = current.total;
+    document.getElementById('cSub').textContent   = 'As of ' + current.time;
+  }
   if (morning) {
     document.getElementById('cMorn').textContent  = morning.total;
     document.getElementById('cMornT').textContent = 'Captured at ' + morning.time;
@@ -412,15 +302,16 @@ function renderCards() {
     document.getElementById('cEveT').textContent = 'Captured at ' + evening.time;
   }
   if (morning && evening) {
-    const resolved = morning.total - evening.total;
-    document.getElementById('cRes').textContent = resolved > 0 ? '+' + resolved : resolved;
+    const r = morning.total - evening.total;
+    document.getElementById('cRes').textContent = r > 0 ? r : 0;
   }
-  // Last fetched = whichever is later
-  const last = evening || morning;
-  if (last) {
-    document.getElementById('cLast').textContent  = last.total;
-    document.getElementById('cLastT').textContent = 'As of ' + last.time;
-  }
+  // Snap status
+  let st = '';
+  if (morning) st += `<span class="ok">✓ 9 AM count (${morning.time})</span>`;
+  if (morning && evening) st += '&ensp;·&ensp;';
+  if (evening) st += `<span class="ok">✓ 6:30 PM count (${evening.time})</span>`;
+  if (!st) st = 'Counts auto-captured at 9 AM and 6:30 PM via GitHub Actions';
+  document.getElementById('snapStatus').innerHTML = st;
 }
 
 // ── Module table ──────────────────────────────────────────────
@@ -428,201 +319,197 @@ function renderModTable() {
   const { morning, evening } = TRACKER_DATA;
   const morn = morning?.modules || {};
   const eve  = evening?.modules || {};
+  const cur  = evening || morning;
+  if (!cur) { document.getElementById('modTable').innerHTML = '<div class="loading">No data available</div>'; return; }
 
-  // Union of all modules, sorted by morning count
   const mods = [...new Set([...Object.keys(morn), ...Object.keys(eve)])]
-    .sort((a, b) => (morn[b] || 0) - (morn[a] || 0));
-
-  const totalMorn = morning?.total || 0;
-  const totalEve  = evening?.total || 0;
-  const allLink   = jiraUrl(BASE_JQL + ' ORDER BY createdDate DESC');
+    .sort((a,b) => (morn[b]||0) - (morn[a]||0));
+  const total    = cur.total;
+  const allLink  = jiraUrl(BASE_JQL + ' ORDER BY createdDate DESC');
+  const totalMods = mods.length;
 
   let h = `<table><thead><tr>
-    <th>Module</th>
-    <th>Morning (${morning?.time || '9 AM'})</th>
-    <th>Evening (${evening?.time || '6:30 PM'})</th>
-    <th>Resolved Today</th>
-    <th>% of Morning</th>
+    <th>Module</th><th>Current Open</th><th>Morning (9AM)</th>
+    <th>Evening (6:30PM)</th><th>Resolved Today</th><th>% of Total</th>
   </tr></thead><tbody>`;
 
   for (const mod of mods) {
-    const m   = morn[mod] ?? 0;
+    const m   = morn[mod] ?? null;
     const e   = eve[mod]  ?? null;
-    const res = e !== null ? m - e : null;
-    const pct = totalMorn > 0 ? ((m / totalMorn) * 100).toFixed(0) : 0;
+    const curVal = e !== null ? e : (m !== null ? m : 0);
+    const res = (m !== null && e !== null) ? m - e : null;
+    const pct = total > 0 ? ((curVal/total)*100).toFixed(0) : 0;
     const link = jiraUrl(moduleJql(mod));
 
     let dCell = '<td class="d-no">—</td>';
     if (res !== null) {
-      if (res > 0)      dCell = `<td class="d-up">✓ ${res} resolved</td>`;
-      else if (res < 0) dCell = `<td class="d-dn">${Math.abs(res)} added</td>`;
+      if (res > 0)      dCell = `<td class="d-up">✓ ${res}</td>`;
+      else if (res < 0) dCell = `<td class="d-dn">+${Math.abs(res)}</td>`;
       else              dCell = `<td class="d-no">No change</td>`;
     }
 
     h += `<tr>
       <td class="mod-name"><a class="row-link" href="${link}" target="_blank">${mod} ↗</a></td>
-      <td><span class="pill p-gray">${m}</span></td>
-      <td>${e !== null ? `<span class="pill p-open">${e}</span>` : '<span style="color:#ccc">—</span>'}</td>
+      <td><span class="pill p-open">${curVal}</span></td>
+      <td>${m !== null ? `<span class="pill p-gray">${m}</span>` : '<span style="color:#ccc">—</span>'}</td>
+      <td>${e !== null ? `<span class="pill p-gray">${e}</span>` : '<span style="color:#ccc">—</span>'}</td>
       ${dCell}
       <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><span style="font-size:11px;color:#6b778c">${pct}%</span></div></td>
     </tr>`;
   }
 
-  // Total row
-  const totalRes = (morning && evening) ? morning.total - evening.total : null;
+  const mT = mods.reduce((s,m) => s+(morn[m]||0), 0);
+  const eT = mods.reduce((s,m) => s+(eve[m]||0), 0);
+  const rT = (Object.keys(eve).length) ? Math.max(0, mT - eT) : null;
   h += `<tr class="total-row">
     <td>TOTAL</td>
-    <td><span class="pill p-gray">${totalMorn}</span></td>
-    <td>${totalEve ? `<span class="pill p-open">${totalEve}</span>` : '—'}</td>
-    <td>${totalRes !== null ? `<span class="pill p-green">✓ ${totalRes} resolved</span>` : '—'}</td>
+    <td><span class="pill p-open">${total}</span></td>
+    <td>${mT ? `<span class="pill p-open">${mT}</span>` : '—'}</td>
+    <td>${eT ? `<span class="pill p-open">${eT}</span>` : '—'}</td>
+    <td>${rT !== null ? `<span class="pill p-green">✓ ${rT}</span>` : '—'}</td>
     <td></td>
   </tr></tbody></table>
   <div style="font-size:13px;color:#5e6c84;margin-top:10px">
-    Showing <strong style="color:#172b4d">${mods.length}</strong> of
-    <a href="${allLink}" target="_blank" style="color:#0052cc;font-weight:600;text-decoration:none">${mods.length} ↗</a>
+    Showing <strong style="color:#172b4d">${totalMods}</strong> of
+    <a href="${allLink}" target="_blank" style="color:#0052cc;font-weight:600;text-decoration:none">${totalMods} ↗</a>
     statistics
   </div>`;
 
   document.getElementById('modTable').innerHTML = h;
 }
 
-// ── History table (30 days, module-level detail) ──────────────
+// ── History table — 30 days, module-level ─────────────────────
 function renderHistory() {
   const hist = (TRACKER_DATA.history || []).slice(-30).reverse();
   if (!hist.length) {
-    document.getElementById('histTable').innerHTML = '<div style="color:#97a0af;padding:12px">No history yet — data accumulates daily</div>';
+    document.getElementById('histTable').innerHTML = '<div class="loading">No history yet — builds daily at 9 AM &amp; 6:30 PM</div>';
     return;
   }
-
   let h = '';
   for (const day of hist) {
     const morn = day.morning?.modules || {};
-    const eve  = day.evening?.modules  || {};
+    const eve  = day.evening?.modules || {};
     const mT   = day.morning?.total ?? null;
-    const eT   = day.evening?.total  ?? null;
+    const eT   = day.evening?.total ?? null;
     const rT   = (mT !== null && eT !== null) ? mT - eT : null;
 
-    // Day header row
-    h += `<div style="background:#f0f2f5;padding:8px 12px;border-radius:8px 8px 0 0;margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-      <strong style="font-size:13px;color:#172b4d">${day.date}</strong>
-      ${mT !== null ? `<span class="pill p-gray">🌅 Morning: ${mT}</span>` : ''}
-      ${eT !== null ? `<span class="pill p-open">🌆 Evening: ${eT}</span>` : '<span style="font-size:11px;color:#97a0af">Evening: pending</span>'}
+    h += `<div class="hist-day-header">
+      <strong>${day.date}</strong>
+      ${mT !== null ? `<span class="pill p-gray">🌅 Morning: ${mT} @ ${day.morning.time}</span>` : ''}
+      ${eT !== null ? `<span class="pill p-open">🌆 Evening: ${eT} @ ${day.evening.time}</span>` : '<span style="font-size:11px;color:#97a0af">Evening: pending</span>'}
       ${rT !== null ? `<span class="pill p-green">✓ ${rT} resolved</span>` : ''}
     </div>`;
 
-    // Module detail table
     const allMods = [...new Set([...Object.keys(morn), ...Object.keys(eve)])]
-      .sort((a, b) => (morn[b] || 0) - (morn[a] || 0));
+      .sort((a,b) => (morn[b]||0) - (morn[a]||0));
 
     if (allMods.length) {
-      h += `<table style="border-radius:0 0 8px 8px;overflow:hidden;margin-bottom:4px">
-        <thead><tr>
-          <th>Module</th>
-          <th>Morning (${day.morning?.time || '—'})</th>
-          <th>Evening (${day.evening?.time || '—'})</th>
-          <th>Resolved</th>
-        </tr></thead><tbody>`;
+      h += `<table style="margin-bottom:6px"><thead><tr>
+        <th>Module</th>
+        <th>Morning (${day.morning?.time || '—'})</th>
+        <th>Evening (${day.evening?.time || '—'})</th>
+        <th>Resolved</th>
+        <th>% of Morning</th>
+      </tr></thead><tbody>`;
+
       for (const mod of allMods) {
-        const m = morn[mod] ?? null;
-        const e = eve[mod]  ?? null;
-        const r = (m !== null && e !== null) ? m - e : null;
+        const m   = morn[mod] ?? null;
+        const e   = eve[mod]  ?? null;
+        const res = (m !== null && e !== null) ? m - e : null;
+        const pct = mT > 0 && m !== null ? ((m/mT)*100).toFixed(0) : 0;
         let rCell = '<td class="d-no">—</td>';
-        if (r !== null) {
-          if (r > 0)      rCell = `<td class="d-up">✓ ${r}</td>`;
-          else if (r < 0) rCell = `<td class="d-dn">${Math.abs(r)} added</td>`;
-          else            rCell = `<td class="d-no">No change</td>`;
+        if (res !== null) {
+          if (res > 0)      rCell = `<td class="d-up">✓ ${res}</td>`;
+          else if (res < 0) rCell = `<td class="d-dn">+${Math.abs(res)} added</td>`;
+          else              rCell = `<td class="d-no">No change</td>`;
         }
         h += `<tr>
           <td class="mod-name">${mod}</td>
           <td>${m !== null ? `<span class="pill p-gray">${m}</span>` : '—'}</td>
           <td>${e !== null ? `<span class="pill p-open">${e}</span>` : '<span style="color:#ccc">—</span>'}</td>
           ${rCell}
+          <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><span style="font-size:11px;color:#6b778c">${pct}%</span></div></td>
         </tr>`;
       }
-      // Total row
       h += `<tr class="total-row">
         <td>TOTAL</td>
-        <td>${mT !== null ? `<span class="pill p-gray">${mT}</span>` : '—'}</td>
+        <td>${mT !== null ? `<span class="pill p-open">${mT}</span>` : '—'}</td>
         <td>${eT !== null ? `<span class="pill p-open">${eT}</span>` : '—'}</td>
         <td>${rT !== null ? `<span class="pill p-green">✓ ${rT} resolved</span>` : '—'}</td>
-      </tr>`;
-      h += '</tbody></table>';
+        <td></td>
+      </tr></tbody></table>`;
     }
   }
-
-  document.getElementById('histTable').innerHTML = h || '<div style="color:#97a0af;padding:12px">No history yet</div>';
+  document.getElementById('histTable').innerHTML = h;
 }
 
 // ── Charts ────────────────────────────────────────────────────
 function renderCharts() {
-  const { morning, evening } = TRACKER_DATA;
+  const { morning, evening, history } = TRACKER_DATA;
   if (!morning) return;
-
   const morn = morning.modules;
   const eve  = evening?.modules || {};
-  const mods = Object.keys(morn).sort((a,b) => morn[b] - morn[a]).slice(0, 15);
+  const mods = Object.keys(morn).sort((a,b) => morn[b]-morn[a]).slice(0,15);
 
-  // Morning vs Evening bar chart
+  // Morning vs Evening
   const ctx1 = document.getElementById('chartModule').getContext('2d');
   if (charts.module) charts.module.destroy();
   charts.module = new Chart(ctx1, {
     type: 'bar',
-    data: {
-      labels: mods,
-      datasets: [
-        { label: 'Morning', data: mods.map(m => morn[m] || 0), backgroundColor: '#ff8b00', borderRadius: 3 },
-        { label: 'Evening', data: mods.map(m => eve[m]  || 0), backgroundColor: '#5243aa', borderRadius: 3 }
-      ]
-    },
-    options: { responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'top', labels: { font: { size: 10 } } } },
-      scales: { x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 35 } },
-                y: { beginAtZero: true, ticks: { stepSize: 5, font: { size: 10 } } } } }
+    data: { labels: mods, datasets: [
+      { label: 'Morning', data: mods.map(m => morn[m]||0), backgroundColor: '#ff8b00', borderRadius: 3 },
+      { label: 'Evening', data: mods.map(m => eve[m]||0),  backgroundColor: '#5243aa', borderRadius: 3 }
+    ]},
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'top', labels:{ font:{size:10} } } },
+      scales:{ x:{ grid:{display:false}, ticks:{font:{size:9},maxRotation:35} },
+               y:{ beginAtZero:true, ticks:{font:{size:10}} } } }
   });
 
   // Resolved by module
-  const resolvedMods = mods.filter(m => (morn[m] || 0) - (eve[m] || 0) > 0)
+  const resMods = mods.filter(m => (morn[m]||0)-(eve[m]||0)>0)
     .sort((a,b) => ((morn[b]||0)-(eve[b]||0)) - ((morn[a]||0)-(eve[a]||0)));
   const ctx2 = document.getElementById('chartResolved').getContext('2d');
   if (charts.resolved) charts.resolved.destroy();
   charts.resolved = new Chart(ctx2, {
     type: 'bar',
-    data: {
-      labels: resolvedMods,
-      datasets: [{ label: 'Resolved', data: resolvedMods.map(m => (morn[m]||0)-(eve[m]||0)),
-        backgroundColor: '#00875a', borderRadius: 3 }]
-    },
-    options: { responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 35 } },
-                y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } } } }
+    data: { labels: resMods.length ? resMods : ['No data yet'],
+            datasets: [{ label:'Resolved', data: resMods.length ? resMods.map(m=>(morn[m]||0)-(eve[m]||0)) : [0],
+              backgroundColor:'#00875a', borderRadius:3 }] },
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false} },
+      scales:{ x:{ grid:{display:false}, ticks:{font:{size:9},maxRotation:35} },
+               y:{ beginAtZero:true, ticks:{font:{size:10}} } } }
+  });
+
+  // 30-day trend
+  const trend = (history||[]).slice(-30);
+  const ctx3 = document.getElementById('chartTrend').getContext('2d');
+  if (charts.trend) charts.trend.destroy();
+  charts.trend = new Chart(ctx3, {
+    type: 'line',
+    data: { labels: trend.map(d => d.date.slice(5)),
+      datasets: [
+        { label:'Morning', data: trend.map(d=>d.morning?.total||null), borderColor:'#ff8b00', backgroundColor:'rgba(255,139,0,.1)', tension:.3, fill:true, pointRadius:4 },
+        { label:'Evening', data: trend.map(d=>d.evening?.total||null), borderColor:'#5243aa', backgroundColor:'rgba(82,67,170,.1)', tension:.3, fill:true, pointRadius:4 }
+      ]},
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'top', labels:{font:{size:10}} } },
+      scales:{ x:{ grid:{display:false}, ticks:{font:{size:10}} },
+               y:{ beginAtZero:true, ticks:{font:{size:10}} } } }
   });
 }
 
-// ── Reload page (picks up latest GitHub Action commit) ────────
-function reloadPage() {
-  const btn = document.getElementById('reloadBtn');
-  btn.textContent = '↻ Reloading…';
-  btn.disabled = true;
-  // Force-reload bypassing cache to get latest committed index.html
-  window.location.reload(true);
-}
-
-// ── Updated badge & header ─────────────────────────────────────
+// ── Header ────────────────────────────────────────────────────
 function renderHeader() {
   const d = new Date();
-  document.getElementById('dateLabel').textContent = d.toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-  });
-  const lastUpdated = new Date(TRACKER_DATA.lastUpdated);
-  const ago = Math.round((Date.now() - lastUpdated) / 60000);
-  const agoStr = ago < 60 ? `${ago}m ago` : ago < 1440 ? `${Math.round(ago/60)}h ago` : `${Math.round(ago/1440)}d ago`;
-  document.getElementById('updatedBadge').textContent = `✓ Data updated ${agoStr}`;
-  document.getElementById('updatedBadge').style.background = ago > 120 ? '#fffae6' : '#e3fcef';
-  document.getElementById('updatedBadge').style.color      = ago > 120 ? '#7a5c00' : '#006644';
-  // Show last fetch time in action bar
-  const note = document.getElementById('lastFetchNote');
-  if (note) note.textContent = `Last fetch: ${lastUpdated.toLocaleString('en-IN', {timeZone:'Asia/Kolkata', hour:'2-digit', minute:'2-digit', day:'numeric', month:'short'})} IST`;
+  document.getElementById('dateLabel').textContent = d.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  if (TRACKER_DATA.lastUpdated) {
+    const lu = new Date(TRACKER_DATA.lastUpdated);
+    const ago = Math.round((Date.now()-lu)/60000);
+    const agoStr = ago < 60 ? `${ago}m ago` : ago < 1440 ? `${Math.round(ago/60)}h ago` : `${Math.round(ago/1440)}d ago`;
+    document.getElementById('lastUpdate').textContent = `Refreshed ${agoStr}`;
+  }
 }
 
 // ── Init ──────────────────────────────────────────────────────
