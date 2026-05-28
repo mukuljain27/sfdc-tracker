@@ -80,6 +80,7 @@
     .row-link:hover { text-decoration: underline; }
     .total-row td { font-weight: 700; background: #f8f9fb; }
     .loading { display: flex; align-items: center; justify-content: center; height: 70px; color: #97a0af; font-size: 13px; }
+    .avatar { width: 22px; height: 22px; border-radius: 50%; margin-right: 5px; vertical-align: middle; background: #ebecf0; }
 
     .hist-day-header { background: #f4f5f7; padding: 10px 14px; border-radius: 8px 8px 0 0; margin-top: 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-left: 3px solid #0052cc; }
     .hist-day-header strong { font-size: 13px; color: #172b4d; }
@@ -137,6 +138,7 @@
 <!-- ── Tabs ───────────────────────────────────── -->
 <div class="tabs">
   <div class="tab active" onclick="switchTab('modules')">By Module</div>
+  <div class="tab" onclick="switchTab('bugs')">Bugs &amp; Risks</div>
   <div class="tab" onclick="switchTab('assignee')">By Assignee</div>
   <div class="tab" onclick="switchTab('status')">By Status</div>
   <div class="tab" onclick="switchTab('charts')">Charts</div>
@@ -162,9 +164,9 @@
   <div class="section">
     <div class="sec-header">
       <div class="sec-title">Assignee-wise SFDC Count</div>
-      <div class="sec-sub">Open SFDC issues per team member</div>
+      <div class="sec-sub">Open SFDC issues per team member · Last fetched 29 May 2026</div>
     </div>
-    <div id="assigneeTable"><div class="loading" style="color:#97a0af;flex-direction:column;gap:6px"><span>Assignee data requires live Jira connection</span><a href="https://github.com/mukuljain27/sfdc-tracker/actions/workflows/update.yml" target="_blank" style="font-size:11px;color:#0052cc">⚡ Trigger update to refresh →</a></div></div>
+    <div id="assigneeTable"><div class="loading">Loading…</div></div>
   </div>
 </div>
 
@@ -173,9 +175,9 @@
   <div class="section">
     <div class="sec-header">
       <div class="sec-title">Status-wise Breakdown</div>
-      <div class="sec-sub">Distribution of open SFDC issues by workflow status</div>
+      <div class="sec-sub">Distribution of open SFDC issues by workflow status · Last fetched 29 May 2026</div>
     </div>
-    <div id="statusTable"><div class="loading" style="color:#97a0af;flex-direction:column;gap:6px"><span>Status data requires live Jira connection</span><a href="https://github.com/mukuljain27/sfdc-tracker/actions/workflows/update.yml" target="_blank" style="font-size:11px;color:#0052cc">⚡ Trigger update to refresh →</a></div></div>
+    <div id="statusTable"><div class="loading">Loading…</div></div>
   </div>
 </div>
 
@@ -192,7 +194,7 @@
     </div>
   </div>
   <div class="section">
-    <div class="sec-title" style="margin-bottom:12px">30-Day Trend (Morning Total)</div>
+    <div class="sec-title" style="margin-bottom:12px">30-Day Trend (Morning &amp; Evening)</div>
     <div class="chart-wrap" style="height:180px"><canvas id="chartTrend"></canvas></div>
   </div>
 </div>
@@ -201,10 +203,28 @@
 <div class="tab-panel" id="tab-history">
   <div class="section">
     <div class="sec-header">
-      <div class="sec-title">Daily History (Last 30 Days)</div>
+      <div class="sec-title">Daily History (Last 90 Days)</div>
       <div class="sec-sub">Module-wise morning → evening counts per day</div>
     </div>
     <div id="histTable"><div class="loading">Loading…</div></div>
+  </div>
+</div>
+
+<!-- ── Tab: Bugs & Risks ───────────────────────── -->
+<div class="tab-panel" id="tab-bugs">
+  <div class="section">
+    <div class="sec-header">
+      <div class="sec-title">Bugs &amp; Risks Dashboard</div>
+      <div class="sec-sub"><a class="jira-link" href="https://birdeye.atlassian.net/jira/dashboards/11361" target="_blank">↗ View Dashboard 11361 in Jira</a></div>
+    </div>
+    <div id="bugsTable"><div class="loading">Loading…</div></div>
+    <div style="margin-top:8px;padding:8px 4px">
+      <span class="snap-status" id="bugsSnapStatus" style="font-size:12px;color:#6b778c"></span>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title" style="margin-bottom:12px">Bugs &amp; Risks History (Last 90 Days)</div>
+    <div id="bugsHistory"><div class="loading">Loading…</div></div>
   </div>
 </div>
 
@@ -213,523 +233,252 @@
 // ACTION_DATA_START
 const TRACKER_DATA = {
   "date": "2026-05-28",
-  "lastUpdated": "2026-05-28T22:24:05.536962+05:30",
+  "lastUpdated": "2026-05-29T10:00:00+05:30",
+  "assignees": {
+    "Amit Solanki":               { "count": 17, "email": "amit.solanki@birdeye.com",         "avatar": "https://secure.gravatar.com/avatar/726c1d930bef639dae27002259b3dbab?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAS-3.png" },
+    "Anoop Chaubey":              { "count": 16, "email": "anoop.chaubey@birdeye.com",         "avatar": "https://secure.gravatar.com/avatar/8a09fd2be146444d93afe7782c5c3f3a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAC-2.png" },
+    "Shubham Aggarwal (Campaigns)": { "count": 7, "email": "shubham.aggarwal1@birdeye.com",   "avatar": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:69eba13e-b55d-4787-bb7e-23916a3b1172/8e8f9d87-7102-4f01-bcec-339d91c095b7/48" },
+    "Pankaj Rautela":             { "count": 7,  "email": "pankaj.rautela@birdeye.com",        "avatar": "https://secure.gravatar.com/avatar/419171265153f51acc3a4f02cca779db?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FPR-1.png" },
+    "Priyanshi Garg":             { "count": 6,  "email": "priyanshi.garg@birdeye.com",        "avatar": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:c0fc2ba2-94c4-4001-a53a-443d2ddc673d/50a27c7a-ad90-4873-b4fe-b8774e0efe1c/48" },
+    "Deepak Mishra":              { "count": 5,  "email": "deepak.mishra@birdeye.com",         "avatar": "https://secure.gravatar.com/avatar/7fc17aa5b598b2cf052b412d0780d6a5?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDM-3.png" },
+    "Amit Kushawaha":             { "count": 4,  "email": "amit.kushawaha@birdeye.com",        "avatar": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/557058:ae0e02e4-3c62-4bd4-a1c8-89075812dc58/8df7d67d-f635-4448-89e7-2fb7be00438b/48" },
+    "Aman Pandey":                { "count": 3,  "email": "aman.pandey@birdeye.com",           "avatar": "https://secure.gravatar.com/avatar/5b2290f253ee3662989c529ff3db622b?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAP-1.png" },
+    "Ansh Gupta":                 { "count": 3,  "email": "ansh.gupta@birdeye.com",            "avatar": "https://secure.gravatar.com/avatar/5547a47b19570aaaad1c69af1cb4944c?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAG-4.png" },
+    "Mukul Jain":                 { "count": 2,  "email": "mukul.jain@birdeye.com",            "avatar": "https://secure.gravatar.com/avatar/818bba1675395b4de3b73b3ca1b219a8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FMJ-5.png" },
+    "Shubham Mittal":             { "count": 2,  "email": "shubham.mittal@birdeye.com",        "avatar": "https://secure.gravatar.com/avatar/3478b58f9d9a11d33b4a8539e43a7b9c?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSM-0.png" },
+    "Rajan Gupta":                { "count": 2,  "email": "rajan.gupta@birdeye.com",           "avatar": "https://secure.gravatar.com/avatar/91513571932312fbb84a15619a290e5e?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FRG-4.png" },
+    "Gaurav Sharma":              { "count": 2,  "email": "gaurav.sharma2@birdeye.com",        "avatar": "https://secure.gravatar.com/avatar/cc71050572f04a7fc94d3a7d6333c0d9?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FGS-5.png" },
+    "Akshat Jain":                { "count": 2,  "email": "akshat.jain@birdeye.com",           "avatar": "https://secure.gravatar.com/avatar/1dc8770c486de420afe854507f0db09c?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAJ-1.png" },
+    "Kailash Yadav":              { "count": 2,  "email": "kailash@birdeye.com",               "avatar": "https://secure.gravatar.com/avatar/cd8aa40ea94987598df98fe827479ba9?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FKY-6.png" },
+    "Ayushi Awasthi":             { "count": 2,  "email": "ayushi.awasthi@birdeye.com",        "avatar": "https://secure.gravatar.com/avatar/9969111c42c6798b722602c2477b3683?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAA-1.png" },
+    "Krishnakant Dwivedi":        { "count": 2,  "email": "krishnakant.dwivedi@birdeye.com",   "avatar": "https://secure.gravatar.com/avatar/b136c4a55b5319ee8803b4e7855e9cca?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FKD-6.png" },
+    "Harshit Gupta":              { "count": 2,  "email": "harshit.gupta@birdeye.com",         "avatar": "https://secure.gravatar.com/avatar/a9db1ea7777d03b29b77842125608f6e?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FHG-2.png" },
+    "Sasidhar Lingaladinne":      { "count": 2,  "email": "sasidhar.lingaladinne@birdeye.com", "avatar": "https://secure.gravatar.com/avatar/9d26e28d78c69b4aa7bfe64785a3058d?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSL-3.png" },
+    "Mukul Jindal":               { "count": 2,  "email": "mukul.jindal@birdeye.com",          "avatar": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5acb01c15f7e4d2b9588ca89/faaa1e59-4059-4612-9967-228508364362/48" },
+    "Divya Chaturvedi":           { "count": 2,  "email": "divya.chaturvedi@birdeye.com",      "avatar": "https://secure.gravatar.com/avatar/822be0d2f059416f40a983f0bdf32470?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDC-4.png" },
+    "Neha Kushwaha":              { "count": 2,  "email": "neha.kushwaha@birdeye.com",         "avatar": "https://secure.gravatar.com/avatar/f9325f7c7f2c929e3227e8996a658129?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FNK-1.png" },
+    "Kripansh Banga":             { "count": 2,  "email": "kripansh.banga@birdeye.com",        "avatar": "https://secure.gravatar.com/avatar/654ec4a5f2a10af6cd6b1799c175b7e7?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FKB-3.png" },
+    "Dhaivat Mehta":              { "count": 2,  "email": "dhaivat.mehta@birdeye.com",         "avatar": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/633d5d0b7f85f16777a20e9a/e70d574d-d60b-41d9-8f23-385e60639a8f/48" },
+    "Nikhil Pandey":              { "count": 2,  "email": "nikhil.pandey@birdeye.com",         "avatar": "https://secure.gravatar.com/avatar/cbcdee52c2c80f7f761ad8cfed6c24b3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FNP-5.png" },
+    "Suraj Saste":                { "count": 2,  "email": "suraj.saste@birdeye.com",           "avatar": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/712020:9e0df90b-47f3-4664-9523-f2046c5b3096/e92f1f04-7650-4a26-b6f2-7c9e469be41a/48" },
+    "Roopal Kumar":               { "count": 2,  "email": "roopal.kumar@birdeye.com",          "avatar": "https://secure.gravatar.com/avatar/2d8bbc005e5a658c832da3f78c9f01e2?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FRK-3.png" },
+    "Unassigned":                 { "count": 1,  "email": "",                                  "avatar": "" }
+  },
+  "statuses": {
+    "In Progress":           { "count": 85, "cat": "In Progress" },
+    "Not Started":           { "count": 54, "cat": "To Do"       },
+    "Ready for engineering": { "count": 3,  "cat": "To Do"       },
+    "In Review":             { "count": 2,  "cat": "In Progress" },
+    "Verified on Demo":      { "count": 1,  "cat": "In Progress" }
+  },
   "morning": {
     "time": "10:07 AM",
     "total": 188,
     "modules": {
-      "Campaign": 32,
-      "Listings": 26,
-      "Account": 16,
-      "Social": 15,
-      "Search AI": 11,
-      "Reviews": 11,
-      "Surveys": 7,
-      "Reports": 6,
-      "Integrations": 5,
-      "Aggregation": 5,
-      "Profile": 5,
-      "NLP": 5,
-      "Other": 4,
-      "Salesforce": 4,
-      "Billing Flow": 3,
-      "Messenger": 3,
-      "Settings": 3,
-      "Payments": 3,
-      "DoUp": 3,
-      "Insights": 3,
-      "Competitors": 2,
-      "SSO": 2,
-      "Kontacto": 2,
-      "Channel": 2,
-      "Website": 2,
-      "API": 1,
-      "Mass Texting": 1,
-      "Unsupported CRM": 1,
-      "Marketing Automation": 1,
-      "Review Response": 1,
-      "Webchat": 1,
-      "Inbox": 1,
-      "Mobile App": 1
+      "Campaign": 32, "Listings": 26, "Account": 16, "Social": 15, "Search AI": 11,
+      "Reviews": 11, "Surveys": 7, "Reports": 6, "Integrations": 5, "Aggregation": 5,
+      "Profile": 5, "NLP": 5, "Other": 4, "Salesforce": 4, "Billing Flow": 3,
+      "Messenger": 3, "Settings": 3, "Payments": 3, "DoUp": 3, "Insights": 3,
+      "Competitors": 2, "SSO": 2, "Kontacto": 2, "Channel": 2, "Website": 2,
+      "API": 1, "Mass Texting": 1, "Unsupported CRM": 1, "Marketing Automation": 1,
+      "Review Response": 1, "Webchat": 1, "Inbox": 1, "Mobile App": 1
     }
   },
-  "evening": null,
+  "evening": {
+    "time": "6:30 PM",
+    "total": 143,
+    "modules": {
+      "Campaign": 27, "Reports": 12, "Social": 11, "Listings": 10, "Account": 9,
+      "Surveys": 6, "Search AI": 5, "Integrations": 5, "Reviews": 5, "Settings": 5,
+      "Aggregation": 5, "Profile": 5, "Competitors": 4, "Messenger": 4, "Salesforce": 4,
+      "Billing Flow": 3, "NLP": 3, "Website": 3, "Payments": 3, "Insights": 3,
+      "SSO": 2, "Kontacto": 2, "DoUp": 2, "Review Response": 1, "Webchat": 1,
+      "Mobile App": 1, "Channel": 1, "Other": 1
+    }
+  },
   "history": [
     {
       "date": "2026-05-20",
-      "evening": {
-        "time": "6:30 PM",
-        "total": 194,
-        "modules": {
-          "Integrations": 8,
-          "Webchat": 1,
-          "Social": 12,
-          "Listings": 18,
-          "Other": 4,
-          "Reports": 8,
-          "Account": 13,
-          "Messenger": 7,
-          "Campaign": 28,
-          "Aggregation": 6,
-          "Kontacto": 4,
-          "Reviews": 13,
-          "API": 2,
-          "Surveys": 10,
-          "Settings": 9,
-          "Dashboard": 1,
-          "Search AI": 6,
-          "Profile": 5,
-          "Web Chat": 1,
-          "Salesforce": 6,
-          "DoUp": 4,
-          "Billing Flow": 3,
-          "NLP": 2,
-          "Insights": 4,
-          "Website": 3,
-          "Update Billing Info": 1,
-          "Ticketing": 1,
-          "Marketing Automation": 1,
-          "Mobile App": 4,
-          "Channel": 2,
-          "Payments": 4,
-          "Armor": 1,
-          "SSO": 1,
-          "Competitors": 1
-        }
-      }
+      "evening": { "time": "6:30 PM", "total": 194, "modules": {
+        "Integrations": 8, "Webchat": 1, "Social": 12, "Listings": 18, "Other": 4,
+        "Reports": 8, "Account": 13, "Messenger": 7, "Campaign": 28, "Aggregation": 6,
+        "Kontacto": 4, "Reviews": 13, "API": 2, "Surveys": 10, "Settings": 9,
+        "Dashboard": 1, "Search AI": 6, "Profile": 5, "Web Chat": 1, "Salesforce": 6,
+        "DoUp": 4, "Billing Flow": 3, "NLP": 2, "Insights": 4, "Website": 3,
+        "Update Billing Info": 1, "Ticketing": 1, "Marketing Automation": 1,
+        "Mobile App": 4, "Channel": 2, "Payments": 4, "Armor": 1, "SSO": 1, "Competitors": 1
+      }}
     },
     {
       "date": "2026-05-21",
-      "morning": {
-        "time": "10:13 AM",
-        "total": 228,
-        "modules": {
-          "Campaign": 33,
-          "Listings": 25,
-          "Account": 22,
-          "Social": 16,
-          "Aggregation": 10,
-          "Messenger": 9,
-          "Reviews": 9,
-          "Surveys": 8,
-          "Integrations": 7,
-          "Salesforce": 7,
-          "Insights": 6,
-          "Profile": 6,
-          "Settings": 6,
-          "Other": 5,
-          "Payments": 5,
-          "Channel": 4,
-          "Mobile App": 4,
-          "Reports": 4,
-          "API": 4,
-          "Search AI": 4,
-          "Billing Flow": 3,
-          "Review Response": 3,
-          "Website": 3,
-          "Inbox": 3,
-          "Web Chat": 3,
-          "NLP": 3,
-          "Marketing Automation": 2,
-          "Kontacto": 2,
-          "Competitors": 2,
-          "SSO": 2,
-          "Integration": 1,
-          "Update Billing Info": 1,
-          "Appointments": 1,
-          "Ticketing": 1,
-          "Survey": 1,
-          "Webchat": 1,
-          "Past Due": 1,
-          "DoUp": 1
-        }
-      },
-      "evening": {
-        "time": "6:05 PM",
-        "total": 142,
-        "modules": {
-          "Campaign": 22,
-          "Social": 10,
-          "Account": 9,
-          "Integrations": 7,
-          "Reviews": 8,
-          "Settings": 8,
-          "Listings": 5,
-          "Insights": 6,
-          "Reports": 5,
-          "Messenger": 5,
-          "Aggregation": 5,
-          "Search AI": 3,
-          "Billing Flow": 3,
-          "Salesforce": 6,
-          "DoUp": 3,
-          "Review Response": 2,
-          "Profile": 4,
-          "Surveys": 4,
-          "Mobile App": 4,
-          "Web Chat": 1,
-          "API": 1,
-          "SSO": 2,
-          "NLP": 2,
-          "Website": 3,
-          "Update Billing Info": 1,
-          "Ticketing": 1,
-          "Marketing Automation": 1,
-          "Other": 3,
-          "Channel": 2,
-          "Payments": 3,
-          "Armor": 1,
-          "Kontacto": 1,
-          "Competitors": 1
-        }
-      }
+      "morning": { "time": "10:13 AM", "total": 228, "modules": {
+        "Campaign": 33, "Listings": 25, "Account": 22, "Social": 16, "Aggregation": 10,
+        "Messenger": 9, "Reviews": 9, "Surveys": 8, "Integrations": 7, "Salesforce": 7,
+        "Insights": 6, "Profile": 6, "Settings": 6, "Other": 5, "Payments": 5,
+        "Channel": 4, "Mobile App": 4, "Reports": 4, "API": 4, "Search AI": 4,
+        "Billing Flow": 3, "Review Response": 3, "Website": 3, "Inbox": 3, "Web Chat": 3,
+        "NLP": 3, "Marketing Automation": 2, "Kontacto": 2, "Competitors": 2, "SSO": 2,
+        "Integration": 1, "Update Billing Info": 1, "Appointments": 1, "Ticketing": 1,
+        "Survey": 1, "Webchat": 1, "Past Due": 1, "DoUp": 1
+      }},
+      "evening": { "time": "6:05 PM", "total": 142, "modules": {
+        "Campaign": 22, "Social": 10, "Account": 9, "Integrations": 7, "Reviews": 8,
+        "Settings": 8, "Listings": 5, "Insights": 6, "Reports": 5, "Messenger": 5,
+        "Aggregation": 5, "Search AI": 3, "Billing Flow": 3, "Salesforce": 6, "DoUp": 3,
+        "Review Response": 2, "Profile": 4, "Surveys": 4, "Mobile App": 4, "Web Chat": 1,
+        "API": 1, "SSO": 2, "NLP": 2, "Website": 3, "Update Billing Info": 1, "Ticketing": 1,
+        "Marketing Automation": 1, "Other": 3, "Channel": 2, "Payments": 3, "Armor": 1,
+        "Kontacto": 1, "Competitors": 1
+      }}
     },
     {
       "date": "2026-05-22",
-      "morning": {
-        "time": "9:05 AM",
-        "total": 194,
-        "modules": {
-          "Campaign": 28,
-          "Listings": 18,
-          "Reviews": 13,
-          "Account": 13,
-          "Social": 12,
-          "Surveys": 10,
-          "Settings": 9,
-          "Integrations": 8,
-          "Reports": 8,
-          "Messenger": 7,
-          "Search AI": 6,
-          "Salesforce": 6,
-          "Aggregation": 6,
-          "Profile": 5,
-          "Mobile App": 4,
-          "Payments": 4,
-          "Insights": 4,
-          "Kontacto": 4,
-          "DoUp": 4,
-          "Other": 4,
-          "Billing Flow": 3,
-          "Website": 3,
-          "Web Chat": 2,
-          "API": 2,
-          "NLP": 2,
-          "Channel": 2,
-          "Dashboard": 1,
-          "Update Billing Info": 1,
-          "Ticketing": 1,
-          "Marketing Automation": 1,
-          "Armor": 1,
-          "SSO": 1,
-          "Competitors": 1
-        }
-      },
-      "evening": {
-        "time": "6:35 PM",
-        "total": 130,
-        "modules": {
-          "Campaign": 27,
-          "Social": 14,
-          "Account": 10,
-          "Listings": 10,
-          "Settings": 7,
-          "Integrations": 5,
-          "Reports": 5,
-          "Salesforce": 5,
-          "Surveys": 4,
-          "Reviews": 4,
-          "Mobile App": 4,
-          "Payments": 4,
-          "NLP": 3,
-          "Profile": 3,
-          "Website": 3,
-          "Insights": 3,
-          "Billing Flow": 2,
-          "Messenger": 2,
-          "DoUp": 2,
-          "Channel": 2,
-          "Branding": 1,
-          "Other": 1,
-          "Search AI": 1,
-          "Webchat": 1,
-          "Ticketing": 1,
-          "Marketing Automation": 1,
-          "Armor": 1,
-          "Kontacto": 1,
-          "Aggregation": 1,
-          "SSO": 1,
-          "Competitors": 1
-        }
-      }
+      "morning": { "time": "9:05 AM", "total": 194, "modules": {
+        "Campaign": 28, "Listings": 18, "Reviews": 13, "Account": 13, "Social": 12,
+        "Surveys": 10, "Settings": 9, "Integrations": 8, "Reports": 8, "Messenger": 7,
+        "Search AI": 6, "Salesforce": 6, "Aggregation": 6, "Profile": 5, "Mobile App": 4,
+        "Payments": 4, "Insights": 4, "Kontacto": 4, "DoUp": 4, "Other": 4,
+        "Billing Flow": 3, "Website": 3, "Web Chat": 2, "API": 2, "NLP": 2, "Channel": 2,
+        "Dashboard": 1, "Update Billing Info": 1, "Ticketing": 1,
+        "Marketing Automation": 1, "Armor": 1, "SSO": 1, "Competitors": 1
+      }},
+      "evening": { "time": "6:35 PM", "total": 130, "modules": {
+        "Campaign": 27, "Social": 14, "Account": 10, "Listings": 10, "Settings": 7,
+        "Integrations": 5, "Reports": 5, "Salesforce": 5, "Surveys": 4, "Reviews": 4,
+        "Mobile App": 4, "Payments": 4, "NLP": 3, "Profile": 3, "Website": 3,
+        "Insights": 3, "Billing Flow": 2, "Messenger": 2, "DoUp": 2, "Channel": 2,
+        "Branding": 1, "Other": 1, "Search AI": 1, "Webchat": 1, "Ticketing": 1,
+        "Marketing Automation": 1, "Armor": 1, "Kontacto": 1, "Aggregation": 1,
+        "SSO": 1, "Competitors": 1
+      }}
     },
     {
       "date": "2026-05-25",
-      "morning": {
-        "time": "9:55 AM",
-        "total": 187,
-        "modules": {
-          "Campaign": 28,
-          "Social": 19,
-          "Reviews": 18,
-          "Listings": 12,
-          "Account": 11,
-          "Surveys": 11,
-          "Integrations": 9,
-          "Reports": 8,
-          "Settings": 6,
-          "DoUp": 5,
-          "Mobile App": 5,
-          "Salesforce": 5,
-          "Other": 4,
-          "Insights": 4,
-          "Profile": 4,
-          "Payments": 4,
-          "Search AI": 3,
-          "Messenger": 3,
-          "NLP": 3,
-          "Kontacto": 3,
-          "Aggregation": 3,
-          "Website": 3,
-          "SSO": 2,
-          "API": 2,
-          "Webchat": 2,
-          "Billing Flow": 2,
-          "Channel": 2,
-          "Web Chat": 1,
-          "Ticketing": 1,
-          "Marketing Automation": 1,
-          "Survey": 1,
-          "Armor": 1,
-          "Competitors": 1
-        }
-      },
-      "evening": {
-        "time": "8:16 PM",
-        "total": 130,
-        "modules": {
-          "Campaign": 21,
-          "Account": 11,
-          "Listings": 11,
-          "Reviews": 11,
-          "Surveys": 9,
-          "Social": 8,
-          "Salesforce": 6,
-          "Settings": 6,
-          "Reports": 5,
-          "Integrations": 4,
-          "Mobile App": 4,
-          "NLP": 3,
-          "Profile": 3,
-          "Website": 3,
-          "Insights": 3,
-          "Payments": 3,
-          "Web Chat": 2,
-          "Kontacto": 2,
-          "Search AI": 2,
-          "Webchat": 2,
-          "Aggregation": 2,
-          "Channel": 2,
-          "Armor": 1,
-          "Billing Flow": 1,
-          "Ticketing": 1,
-          "Messenger": 1,
-          "SSO": 1,
-          "Competitors": 1,
-          "DoUp": 1
-        }
-      }
+      "morning": { "time": "9:55 AM", "total": 187, "modules": {
+        "Campaign": 28, "Social": 19, "Reviews": 18, "Listings": 12, "Account": 11,
+        "Surveys": 11, "Integrations": 9, "Reports": 8, "Settings": 6, "DoUp": 5,
+        "Mobile App": 5, "Salesforce": 5, "Other": 4, "Insights": 4, "Profile": 4,
+        "Payments": 4, "Search AI": 3, "Messenger": 3, "NLP": 3, "Kontacto": 3,
+        "Aggregation": 3, "Website": 3, "SSO": 2, "API": 2, "Webchat": 2,
+        "Billing Flow": 2, "Channel": 2, "Web Chat": 1, "Ticketing": 1,
+        "Marketing Automation": 1, "Survey": 1, "Armor": 1, "Competitors": 1
+      }},
+      "evening": { "time": "8:16 PM", "total": 130, "modules": {
+        "Campaign": 21, "Account": 11, "Listings": 11, "Reviews": 11, "Surveys": 9,
+        "Social": 8, "Salesforce": 6, "Settings": 6, "Reports": 5, "Integrations": 4,
+        "Mobile App": 4, "NLP": 3, "Profile": 3, "Website": 3, "Insights": 3,
+        "Payments": 3, "Web Chat": 2, "Kontacto": 2, "Search AI": 2, "Webchat": 2,
+        "Aggregation": 2, "Channel": 2, "Armor": 1, "Billing Flow": 1, "Ticketing": 1,
+        "Messenger": 1, "SSO": 1, "Competitors": 1, "DoUp": 1
+      }}
     },
     {
       "date": "2026-05-26",
-      "morning": {
-        "time": "9:04 AM",
-        "total": 170,
-        "modules": {
-          "Listings": 21,
-          "Campaign": 21,
-          "Account": 18,
-          "Reviews": 17,
-          "Surveys": 11,
-          "Social": 11,
-          "Settings": 7,
-          "Integrations": 7,
-          "Reports": 6,
-          "Salesforce": 6,
-          "NLP": 4,
-          "Aggregation": 4,
-          "Mobile App": 4,
-          "Web Chat": 3,
-          "DoUp": 3,
-          "Profile": 3,
-          "Website": 3,
-          "Payments": 3,
-          "Messenger": 2,
-          "Kontacto": 2,
-          "Search AI": 2,
-          "Webchat": 2,
-          "Billing Flow": 2,
-          "Insights": 2,
-          "Channel": 2,
-          "Armor": 1,
-          "Other": 1,
-          "SSO": 1,
-          "Competitors": 1
-        }
-      },
-      "evening": {
-        "time": "6:31 PM",
-        "total": 98,
-        "modules": {
-          "Campaign": 20,
-          "Listings": 10,
-          "Account": 8,
-          "Surveys": 7,
-          "Salesforce": 5,
-          "Reviews": 5,
-          "NLP": 4,
-          "Reports": 4,
-          "Social": 4,
-          "Profile": 3,
-          "Settings": 3,
-          "Aggregation": 3,
-          "Integrations": 3,
-          "Billing Flow": 2,
-          "Webchat": 2,
-          "Search AI": 2,
-          "Insights": 2,
-          "Channel": 2,
-          "Website": 2,
-          "Payments": 2,
-          "Messenger": 1,
-          "DoUp": 1,
-          "Kontacto": 1,
-          "SSO": 1,
-          "Competitors": 1
-        }
-      }
+      "morning": { "time": "9:04 AM", "total": 170, "modules": {
+        "Listings": 21, "Campaign": 21, "Account": 18, "Reviews": 17, "Surveys": 11,
+        "Social": 11, "Settings": 7, "Integrations": 7, "Reports": 6, "Salesforce": 6,
+        "NLP": 4, "Aggregation": 4, "Mobile App": 4, "Web Chat": 3, "DoUp": 3,
+        "Profile": 3, "Website": 3, "Payments": 3, "Messenger": 2, "Kontacto": 2,
+        "Search AI": 2, "Webchat": 2, "Billing Flow": 2, "Insights": 2, "Channel": 2,
+        "Armor": 1, "Other": 1, "SSO": 1, "Competitors": 1
+      }},
+      "evening": { "time": "6:31 PM", "total": 98, "modules": {
+        "Campaign": 20, "Listings": 10, "Account": 8, "Surveys": 7, "Salesforce": 5,
+        "Reviews": 5, "NLP": 4, "Reports": 4, "Social": 4, "Profile": 3,
+        "Settings": 3, "Aggregation": 3, "Integrations": 3, "Billing Flow": 2,
+        "Webchat": 2, "Search AI": 2, "Insights": 2, "Channel": 2, "Website": 2,
+        "Payments": 2, "Messenger": 1, "DoUp": 1, "Kontacto": 1, "SSO": 1, "Competitors": 1
+      }}
     },
     {
       "date": "2026-05-27",
-      "morning": {
-        "time": "10:05 AM",
-        "total": 188,
-        "modules": {
-          "Campaign": 32,
-          "Listings": 26,
-          "Account": 16,
-          "Social": 15,
-          "Search AI": 11,
-          "Reviews": 11,
-          "Surveys": 7,
-          "Reports": 6,
-          "Integrations": 5,
-          "Aggregation": 5,
-          "Profile": 5,
-          "NLP": 5,
-          "Other": 4,
-          "Settings": 4,
-          "Salesforce": 4,
-          "Billing Flow": 3,
-          "Messenger": 3,
-          "Payments": 3,
-          "DoUp": 3,
-          "Insights": 3,
-          "Competitors": 2,
-          "SSO": 2,
-          "Channel": 2,
-          "Website": 2,
-          "API": 1,
-          "Mass Texting": 1,
-          "Unsupported CRM": 1,
-          "Marketing Automation": 1,
-          "Review Response": 1,
-          "Webchat": 1,
-          "Inbox": 1,
-          "Mobile App": 1,
-          "Kontacto": 1
-        }
-      }
+      "morning": { "time": "10:05 AM", "total": 188, "modules": {
+        "Campaign": 32, "Listings": 26, "Account": 16, "Social": 15, "Search AI": 11,
+        "Reviews": 11, "Surveys": 7, "Reports": 6, "Integrations": 5, "Aggregation": 5,
+        "Profile": 5, "NLP": 5, "Other": 4, "Settings": 4, "Salesforce": 4,
+        "Billing Flow": 3, "Messenger": 3, "Payments": 3, "DoUp": 3, "Insights": 3,
+        "Competitors": 2, "SSO": 2, "Channel": 2, "Website": 2, "API": 1,
+        "Mass Texting": 1, "Unsupported CRM": 1, "Marketing Automation": 1,
+        "Review Response": 1, "Webchat": 1, "Inbox": 1, "Mobile App": 1, "Kontacto": 1
+      }}
     },
+    {
+      "date": "2026-05-28",
+      "morning": { "time": "10:07 AM", "total": 188, "modules": {
+        "Campaign": 32, "Listings": 26, "Account": 16, "Social": 15, "Search AI": 11,
+        "Reviews": 11, "Surveys": 7, "Reports": 6, "Integrations": 5, "Aggregation": 5,
+        "Profile": 5, "NLP": 5, "Other": 4, "Salesforce": 4, "Billing Flow": 3,
+        "Messenger": 3, "Settings": 3, "Payments": 3, "DoUp": 3, "Insights": 3,
+        "Competitors": 2, "SSO": 2, "Kontacto": 2, "Channel": 2, "Website": 2,
+        "API": 1, "Mass Texting": 1, "Unsupported CRM": 1, "Marketing Automation": 1,
+        "Review Response": 1, "Webchat": 1, "Inbox": 1, "Mobile App": 1
+      }},
+      "evening": { "time": "6:30 PM", "total": 143, "modules": {
+        "Campaign": 27, "Reports": 12, "Social": 11, "Listings": 10, "Account": 9,
+        "Surveys": 6, "Search AI": 5, "Integrations": 5, "Reviews": 5, "Settings": 5,
+        "Aggregation": 5, "Profile": 5, "Competitors": 4, "Messenger": 4, "Salesforce": 4,
+        "Billing Flow": 3, "NLP": 3, "Website": 3, "Payments": 3, "Insights": 3,
+        "SSO": 2, "Kontacto": 2, "DoUp": 2, "Review Response": 1, "Webchat": 1,
+        "Mobile App": 1, "Channel": 1, "Other": 1
+      }}
+    }
+  ]
+};
+// ACTION_DATA_END
+
+// ── BUGS DATA — injected by GitHub Action ─────────────────────
+// BUGS_DATA_START
+const BUGS_DATA = {
+  "date": "2026-05-28",
+  "lastUpdated": "2026-05-28T18:30:00+05:30",
+  "morning": {
+    "time": "10:07 AM",
+    "filters": {
+      "14064": 161, "14051": 45, "33187": 19, "15522": 19, "33253": 4,
+      "15527": 79,  "14059": 26, "15523": 117, "15530": 10, "15529": 107
+    }
+  },
+  "evening": {
+    "time": "6:30 PM",
+    "filters": {
+      "14064": 131, "14051": 46, "33187": 19, "15522": 19, "33253": 4,
+      "15527": 71,  "14059": 21, "15523": 91,  "15530": 10, "15529": 88
+    }
+  },
+  "history": [
     {
       "date": "2026-05-28",
       "morning": {
         "time": "10:07 AM",
-        "total": 188,
-        "modules": {
-          "Campaign": 32,
-          "Listings": 26,
-          "Account": 16,
-          "Social": 15,
-          "Search AI": 11,
-          "Reviews": 11,
-          "Surveys": 7,
-          "Reports": 6,
-          "Integrations": 5,
-          "Aggregation": 5,
-          "Profile": 5,
-          "NLP": 5,
-          "Other": 4,
-          "Salesforce": 4,
-          "Billing Flow": 3,
-          "Messenger": 3,
-          "Settings": 3,
-          "Payments": 3,
-          "DoUp": 3,
-          "Insights": 3,
-          "Competitors": 2,
-          "SSO": 2,
-          "Kontacto": 2,
-          "Channel": 2,
-          "Website": 2,
-          "API": 1,
-          "Mass Texting": 1,
-          "Unsupported CRM": 1,
-          "Marketing Automation": 1,
-          "Review Response": 1,
-          "Webchat": 1,
-          "Inbox": 1,
-          "Mobile App": 1
+        "filters": {
+          "14064": 161, "14051": 45, "33187": 19, "15522": 19, "33253": 4,
+          "15527": 79,  "14059": 26, "15523": 117, "15530": 10, "15529": 107
+        }
+      },
+      "evening": {
+        "time": "6:30 PM",
+        "filters": {
+          "14064": 131, "14051": 46, "33187": 19, "15522": 19, "33253": 4,
+          "15527": 71,  "14059": 21, "15523": 91,  "15530": 10, "15529": 88
         }
       }
     }
-  ],
-  "current": {
-    "time": "10:24 PM",
-    "total": 131,
-    "modules": {
-      "Reports": 8,
-      "Settings": 5,
-      "Integrations": 5,
-      "Website": 3,
-      "Social": 10,
-      "Account": 9,
-      "Competitors": 3,
-      "Messenger": 4,
-      "Billing Flow": 3,
-      "Listings": 9,
-      "Campaign": 28,
-      "Aggregation": 5,
-      "API": 1,
-      "Search AI": 2,
-      "Profile": 5,
-      "Surveys": 5,
-      "Payments": 3,
-      "SSO": 2,
-      "Reviews": 4,
-      "Review Response": 1,
-      "Webchat": 1,
-      "Kontacto": 2,
-      "NLP": 3,
-      "Insights": 2,
-      "Channel": 1,
-      "DoUp": 2,
-      "Other": 1,
-      "Salesforce": 4
-    }
-  }
+  ]
 };
-// ACTION_DATA_END
+// BUGS_DATA_END
+
+const BUGS_FILTERS = [
+  { id: '14064', name: 'Total Bugs and Support Items' },
+  { id: '14051', name: 'SOW, Onboarding and Cancellation Risks' },
+  { id: '33187', name: 'NO ETA | SOW, Onboarding and Cancellation Risks' },
+  { id: '15522', name: 'Total (Bugs+Support) | Have ETAs (Blocked excl.)' },
+  { id: '33253', name: 'SOW, Onboarding and Cancellation Risks (Have ETAs)' },
+  { id: '15527', name: 'Have ETAs Bugs (Blocked excl.)' },
+  { id: '14059', name: 'MissedAndMissingETA (Bugs+Support)' },
+  { id: '15523', name: 'Have ETAs Support (Blocked excl.)' },
+  { id: '15530', name: 'ETA to be added - Bugs+Support (Blocked excl.)' },
+  { id: '15529', name: 'ETA to be added Support (Blocked excl.)' },
+];
 
 // ── Constants ─────────────────────────────────────────────────
 const JIRA    = 'https://birdeye.atlassian.net';
@@ -742,7 +491,7 @@ function moduleJql(mod) { return BASE_JQL + ` AND "SFDC Module[Dropdown]" = "${m
 
 // ── Tab switching ──────────────────────────────────────────────
 function switchTab(id) {
-  const ids = ['modules','assignee','status','charts','history'];
+  const ids = ['modules','bugs','assignee','status','charts','history'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ids[i]===id));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
@@ -844,7 +593,7 @@ function renderModTable() {
 
 // ── History table — 30 days, module-level ─────────────────────
 function renderHistory() {
-  const hist = (TRACKER_DATA.history || []).slice(-30).reverse();
+  const hist = (TRACKER_DATA.history || []).slice(-90).reverse();
   if (!hist.length) {
     document.getElementById('histTable').innerHTML = '<div class="loading">No history yet — builds daily at 9 AM &amp; 6:30 PM</div>';
     return;
@@ -907,6 +656,72 @@ function renderHistory() {
   document.getElementById('histTable').innerHTML = h;
 }
 
+// ── Assignee table ────────────────────────────────────────────
+function renderAssigneeTable() {
+  const a     = TRACKER_DATA.assignees || {};
+  const total = TRACKER_DATA.evening?.total || TRACKER_DATA.morning?.total || 145;
+  const people = Object.keys(a).sort((x,y) => a[y].count - a[x].count);
+  let h = `<table><thead><tr><th>Assignee</th><th>Open SFDC</th><th>% of Total</th><th>Open in Jira</th></tr></thead><tbody>`;
+  for (const who of people) {
+    const d   = a[who];
+    const pct = ((d.count / total) * 100).toFixed(0);
+    const jql = d.email
+      ? BASE_JQL + ` AND assignee = "${d.email}" ORDER BY createdDate DESC`
+      : BASE_JQL + ` AND assignee is EMPTY ORDER BY createdDate DESC`;
+    h += `<tr>
+      <td>${d.avatar ? `<img class="avatar" src="${d.avatar}" onerror="this.style.display='none'">` : ''}${who}</td>
+      <td><span class="pill p-open">${d.count}</span></td>
+      <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><span style="font-size:11px;color:#6b778c">${pct}%</span></div></td>
+      <td><a class="row-link" href="${jiraUrl(jql)}" target="_blank">View Issues ↗</a></td>
+    </tr>`;
+  }
+  h += `</tbody></table>`;
+  document.getElementById('assigneeTable').innerHTML = h;
+}
+
+// ── Status table ──────────────────────────────────────────────
+function renderStatusTable() {
+  const s       = TRACKER_DATA.statuses || {};
+  const total   = TRACKER_DATA.evening?.total || TRACKER_DATA.morning?.total || 145;
+  const statuses = Object.keys(s).sort((a,b) => s[b].count - s[a].count);
+  const catColor = { 'To Do': 'p-gray', 'In Progress': 'p-yellow', 'Done': 'p-green' };
+  let h = `<table><thead><tr><th>Status</th><th>Category</th><th>Count</th><th>% of Total</th><th>Open in Jira</th></tr></thead><tbody>`;
+  for (const st of statuses) {
+    const d   = s[st];
+    const pct = ((d.count / total) * 100).toFixed(0);
+    const cl  = catColor[d.cat] || 'p-gray';
+    const jql = BASE_JQL + ` AND status = "${st}" ORDER BY createdDate DESC`;
+    h += `<tr>
+      <td><strong>${st}</strong></td>
+      <td><span class="pill ${cl}">${d.cat}</span></td>
+      <td><span class="pill p-open">${d.count}</span></td>
+      <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><span style="font-size:11px;color:#6b778c">${pct}%</span></div></td>
+      <td><a class="row-link" href="${jiraUrl(jql)}" target="_blank">View ↗</a></td>
+    </tr>`;
+  }
+  h += `</tbody></table>`;
+  document.getElementById('statusTable').innerHTML = h;
+}
+
+// ── Chart helpers ─────────────────────────────────────────────
+function buildBar(id, labels, valFn, pal, label) {
+  const ctx = document.getElementById(id).getContext('2d');
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(ctx, { type:'bar', data:{ labels, datasets:[{ label,
+    data: labels.map(valFn), backgroundColor: labels.map((_,i) => pal[i%pal.length]), borderRadius:4 }]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} },
+      scales:{ x:{grid:{display:false}, ticks:{font:{size:10},maxRotation:30}},
+               y:{beginAtZero:true, ticks:{stepSize:1, font:{size:10}}} }}});
+}
+function buildDoughnut(id, labels, valFn, pal) {
+  const ctx = document.getElementById(id).getContext('2d');
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(ctx, { type:'doughnut', data:{ labels, datasets:[{
+    data: labels.map(valFn), backgroundColor: labels.map((_,i) => pal[i%pal.length]), borderWidth:2 }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ position:'right', labels:{font:{size:10}, boxWidth:12} }}}});
+}
+
 // ── Charts ────────────────────────────────────────────────────
 function renderCharts() {
   const { morning, evening, history } = TRACKER_DATA;
@@ -915,14 +730,14 @@ function renderCharts() {
   const eve  = evening?.modules || {};
   const mods = Object.keys(morn).sort((a,b) => morn[b]-morn[a]).slice(0,15);
 
-  // Morning vs Evening
+  // ── Chart 1: Morning vs Evening by Module ──
   const ctx1 = document.getElementById('chartModule').getContext('2d');
   if (charts.module) charts.module.destroy();
   charts.module = new Chart(ctx1, {
     type: 'bar',
     data: { labels: mods, datasets: [
-      { label: 'Morning', data: mods.map(m => morn[m]||0), backgroundColor: '#ff8b00', borderRadius: 3 },
-      { label: 'Evening', data: mods.map(m => eve[m]||0),  backgroundColor: '#5243aa', borderRadius: 3 }
+      { label:'Morning', data: mods.map(m => morn[m]||0), backgroundColor:'#ff8b00', borderRadius:3 },
+      { label:'Evening', data: mods.map(m => eve[m]||0),  backgroundColor:'#5243aa', borderRadius:3 }
     ]},
     options: { responsive:true, maintainAspectRatio:false,
       plugins:{ legend:{ position:'top', labels:{ font:{size:10} } } },
@@ -930,8 +745,8 @@ function renderCharts() {
                y:{ beginAtZero:true, ticks:{font:{size:10}} } } }
   });
 
-  // Resolved by module
-  const resMods = mods.filter(m => (morn[m]||0)-(eve[m]||0)>0)
+  // ── Chart 2: Resolved Today by Module ──
+  const resMods = mods.filter(m => (morn[m]||0)-(eve[m]||0) > 0)
     .sort((a,b) => ((morn[b]||0)-(eve[b]||0)) - ((morn[a]||0)-(eve[a]||0)));
   const ctx2 = document.getElementById('chartResolved').getContext('2d');
   if (charts.resolved) charts.resolved.destroy();
@@ -946,8 +761,8 @@ function renderCharts() {
                y:{ beginAtZero:true, ticks:{font:{size:10}} } } }
   });
 
-  // 30-day trend
-  const trend = (history||[]).slice(-30);
+  // ── Chart 3: 30-Day Trend (Morning + Evening) ──
+  const trend = (history || []).slice(-30);
   const ctx3 = document.getElementById('chartTrend').getContext('2d');
   if (charts.trend) charts.trend.destroy();
   charts.trend = new Chart(ctx3, {
@@ -976,11 +791,90 @@ function renderHeader() {
   }
 }
 
+// ── Bugs & Risks table ────────────────────────────────────────
+function renderBugsTable() {
+  const morn = BUGS_DATA.morning?.filters || null;
+  const eve  = BUGS_DATA.evening?.filters || null;
+
+  let h = `<table><thead><tr>
+    <th>Card / Filter</th><th>Morning</th><th>Evening</th><th>Change</th><th>Open in Jira</th>
+  </tr></thead><tbody>`;
+
+  for (const f of BUGS_FILTERS) {
+    const m = morn ? (morn[f.id] ?? null) : null;
+    const e = eve  ? (eve[f.id]  ?? null) : null;
+    const delta = (m !== null && e !== null) ? m - e : null;
+    let dCell = '<td class="d-no">—</td>';
+    if (delta !== null) {
+      if (delta > 0)      dCell = `<td class="d-up">↓ ${delta}</td>`;
+      else if (delta < 0) dCell = `<td class="d-dn">↑ ${Math.abs(delta)}</td>`;
+      else                dCell = `<td class="d-no">No change</td>`;
+    }
+    const link = `${JIRA}/issues/?filter=${f.id}`;
+    h += `<tr>
+      <td class="mod-name">${f.name}</td>
+      <td>${m !== null ? `<span class="pill p-gray">${m}</span>` : '<span style="color:#ccc">—</span>'}</td>
+      <td>${e !== null ? `<span class="pill p-gray">${e}</span>` : '<span style="color:#ccc">—</span>'}</td>
+      ${dCell}
+      <td><a class="row-link" href="${link}" target="_blank">View ↗</a></td>
+    </tr>`;
+  }
+  h += '</tbody></table>';
+  document.getElementById('bugsTable').innerHTML = h;
+
+  let st = '';
+  if (BUGS_DATA.morning) st += `<span class="ok">✓ Morning count (${BUGS_DATA.morning.time})</span>`;
+  if (BUGS_DATA.morning && BUGS_DATA.evening) st += '&ensp;·&ensp;';
+  if (BUGS_DATA.evening) st += `<span class="ok">✓ Evening count (${BUGS_DATA.evening.time})</span>`;
+  if (!st) st = 'Counts auto-captured via GitHub Actions at 9 AM &amp; 6:30 PM';
+  document.getElementById('bugsSnapStatus').innerHTML = st;
+  renderBugsHistory();
+}
+
+// ── Bugs & Risks history ──────────────────────────────────────
+function renderBugsHistory() {
+  const hist = (BUGS_DATA.history || []).slice(-90).reverse();
+  if (!hist.length) {
+    document.getElementById('bugsHistory').innerHTML = '<div class="loading">No history yet — builds daily at 9 AM &amp; 6:30 PM</div>';
+    return;
+  }
+  let h = `<table><thead><tr><th>Date</th><th>Filter</th><th>Morning</th><th>Evening</th><th>Change</th></tr></thead><tbody>`;
+  for (const day of hist) {
+    const mF = day.morning?.filters || {};
+    const eF = day.evening?.filters || {};
+    BUGS_FILTERS.forEach((f, i) => {
+      const m = mF[f.id] ?? null;
+      const e = eF[f.id] ?? null;
+      const delta = (m !== null && e !== null) ? m - e : null;
+      h += '<tr>';
+      if (i === 0) h += `<td rowspan="${BUGS_FILTERS.length + 1}" style="font-weight:600;font-size:11px;vertical-align:top;padding-top:8px;color:#5e6c84">${day.date}<br><span style="font-weight:400;color:#97a0af">${day.morning?.time||'—'} / ${day.evening?.time||'—'}</span></td>`;
+      h += `<td style="font-size:12px">${f.name}</td>`;
+      h += `<td>${m !== null ? `<span class="pill p-gray">${m}</span>` : '—'}</td>`;
+      h += `<td>${e !== null ? `<span class="pill p-gray">${e}</span>` : '—'}</td>`;
+      let dc = '<td class="d-no">—</td>';
+      if (delta !== null) { if (delta>0) dc=`<td class="d-up">↓ ${delta}</td>`; else if (delta<0) dc=`<td class="d-dn">↑ ${Math.abs(delta)}</td>`; else dc='<td class="d-no">—</td>'; }
+      h += dc + '</tr>';
+    });
+    const mT = mF['14064'] ?? null; const eT = eF['14064'] ?? null;
+    const rT = (mT !== null && eT !== null) ? mT - eT : null;
+    h += `<tr class="total-row"><td style="font-size:11px;color:#6b778c;text-align:right">TOTAL BUGS</td>
+      <td>${mT !== null ? `<span class="pill p-open">${mT}</span>` : '—'}</td>
+      <td>${eT !== null ? `<span class="pill p-open">${eT}</span>` : '—'}</td>
+      <td>${rT !== null ? (rT>0?`<span class="pill p-green">↓ ${rT}</span>`:rT<0?`<span class="pill p-red">↑ ${Math.abs(rT)}</span>`:'—'):'—'}</td>
+    </tr>`;
+  }
+  h += '</tbody></table>';
+  document.getElementById('bugsHistory').innerHTML = h;
+}
+
 // ── Init ──────────────────────────────────────────────────────
 renderHeader();
 renderCards();
 renderModTable();
+renderAssigneeTable();
+renderStatusTable();
 renderHistory();
+renderBugsTable();
 </script>
 </body>
 </html>
