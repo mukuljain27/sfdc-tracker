@@ -746,7 +746,8 @@ function renderModTable() {
 
 // ── History table — 30 days, module-level ─────────────────────
 function renderHistory() {
-  const hist = (TRACKER_DATA.history || []).slice(-90).reverse();
+  const today = { date: TRACKER_DATA.date, morning: TRACKER_DATA.morning, evening: TRACKER_DATA.evening };
+  const hist = [today, ...(TRACKER_DATA.history || []).slice(-89).reverse()];
   if (!hist.length) {
     document.getElementById('histTable').innerHTML = '<div class="loading">No history yet — builds daily at 9 AM &amp; 6:30 PM</div>';
     return;
@@ -916,7 +917,8 @@ function renderCharts() {
 
   // ── Chart 3: 90-Day Trend SFDC Count (Morning + Evening) ──
   // spanGaps:true connects through days where evening was not captured.
-  const trend = (history || []).slice(-90);
+  const todayPt = { date: TRACKER_DATA.date, morning: TRACKER_DATA.morning, evening: TRACKER_DATA.evening };
+  const trend = [...(history || []).slice(-89), todayPt];
   const ctx3 = document.getElementById('chartTrend').getContext('2d');
   if (charts.trend) charts.trend.destroy();
   charts.trend = new Chart(ctx3, {
@@ -938,7 +940,8 @@ function renderCharts() {
 
   // ── Chart 4A: Total Bugs morning vs evening — grouped bar ──
   // Clear orange = morning, purple = evening. Tooltip shows full filter breakdown.
-  const bugHist    = (BUGS_DATA.history || []).slice(-90);
+  const bugTodayPt = { date: BUGS_DATA.date, morning: BUGS_DATA.morning, evening: BUGS_DATA.evening };
+  const bugHist    = [...(BUGS_DATA.history || []).slice(-89), bugTodayPt];
   const bugLabels  = bugHist.map(d => d.date.slice(5));
   const ctx4 = document.getElementById('chartBugsTrend').getContext('2d');
   if (charts.bugsTrend) charts.bugsTrend.destroy();
@@ -1057,7 +1060,8 @@ function renderBugsTable() {
 
 // ── Bugs & Risks history ──────────────────────────────────────
 function renderBugsHistory() {
-  const hist = (BUGS_DATA.history || []).slice(-90).reverse();
+  const bugToday = { date: BUGS_DATA.date, morning: BUGS_DATA.morning, evening: BUGS_DATA.evening };
+  const hist = [bugToday, ...(BUGS_DATA.history || []).slice(-89).reverse()];
   if (!hist.length) {
     document.getElementById('bugsHistory').innerHTML = '<div class="loading">No history yet — builds daily at 9 AM &amp; 6:30 PM</div>';
     return;
